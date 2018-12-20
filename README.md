@@ -97,14 +97,14 @@ const dl = DigitalLink(uri);
 ```
 
 
-### URL and JSON Generation
+### Web URI and JSON Generation
 
 A `DigitalLink` object can transform itself into a string Web URI representation:
 
 ```js
-const url = dl.toWebUriString();
+const uri = dl.toWebUriString();
 
-console.log(url);
+console.log(uri);
 ```
 
 It is also possible to view the object makeup of the `DigitalLink`. This can
