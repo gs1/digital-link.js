@@ -1,0 +1,75 @@
+* {
+  font-family: sans-serif;
+}
+
+.title {
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 140px px 0px 0px;
+}
+
+.paragraph {
+  text-align: center;
+  font-size: 1.0rem;
+  max-width: 80%;
+  margin: 20px auto 0px auto;
+}
+
+.col-centered {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.input-url {
+  min-width: 700px;
+  max-width: 80%;
+  height: 50px;
+  text-align: center;
+  font-size: 1.5rem;
+  border: none;
+  border-bottom: solid 2px #0005;
+  background-color: white;
+  margin: 10px auto;
+}
+
+.input-url:focus {
+  border-bottom: solid 2px #000;
+  outline: none;
+}
+
+.result {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+
+.trace-wrapper {
+  padding-top: 20px;
+  text-align: left;
+  margin: 0px auto;
+  margin-top: 20px;
+}
+
+.trace-item > span {
+  font-family: monospace;
+  padding: 5px 0px;
+  font-size: 1.0rem;
+}
+
+.state-view {
+  position: fixed;
+  width: 100%;
+  color: #0005;
+  border: none;
+  font-size: 1.0rem;
+  bottom: 0;
+}
