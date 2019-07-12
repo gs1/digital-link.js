@@ -4,13 +4,14 @@
   "description": "An SDK for creating and validating GS1 Digital Link URLs and objects.",
   "main": "src/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha tests/index.js"
+    "test": "nyc mocha tests/index.js && rm -rf .nyc_output"
   },
   "author": "EVRYTHNG",
   "license": "Apache-2.0",
   "devDependencies": {
     "chai": "^4.1.2",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "nyc": "^14.1.1"
   },
   "dependencies": {
     "apg-lib": "^3.2.0",
@@ -19,5 +20,17 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/evrythng/digital-link.js"
+  },
+  "nyc": {
+    "exclude": [
+      "tests/*"
+    ],
+    "reporter": [
+      "cobertura",
+      "html",
+      "lcov",
+      "text-summary"
+    ],
+    "report-dir": "./reports"
   }
 }
