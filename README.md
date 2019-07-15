@@ -91,7 +91,7 @@ const dl = DigitalLink()
 A `DigitalLink` object can also be created using an existing string:
 
 ```js
-const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786?thngId=UMwxDXBdUbxgtyRaR2HBrc4r';
+const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
 
 const dl = DigitalLink(uri);
 ```
@@ -161,6 +161,54 @@ The example above contains an erroneous 'x' at the end, so it does not validate:
   ],
   "success": false
 }
+```
+
+
+### Compression
+
+Since version 1.1.0, compression/decompression of a Digital Link URI can be
+performed. To create a compressed URI, use the `toCompressedWebUriString()`
+method:
+
+```js
+const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
+const dl = DigitalLink(uri);
+
+const compressedUri = dl.toCompressedWebUriString();
+```
+
+To attempt decompression of a compressed URI use the constructor function as
+usual:
+
+```js
+const compressedUri = 'https://dlnkd.tn.gg/DBHKVAdpQgqrCg';
+
+const dl = DigitalLink(compressedUri);
+```
+
+> Note: decompression will fail if the result is not a valid GS1 Digital Link.
+
+The `Utils` object also provides methods for direct compression and
+decompression of URI strings:
+
+```js
+const { Utils } = require('digital-link.js');
+
+const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
+
+// Compress a URI
+const compressedUri = Utils.compressWebUri(uri);
+
+// Compress without optimisations or compressing other key-value pairs
+const useOptimisations = false;
+const compressOtherKeyValuePairs = false;
+const semiCompressedUri = Utils.compressWebUri(uri, useOptimisations, compressOtherKeyValuePairs);
+
+// Decompress a compressed URI
+const decompressedUri = Utils.decompressWebUri(compressedUri);
+
+// Detect if a URI is compressed
+const isCompressed = Utils.isCompressedWebUri(compressedUri);
 ```
 
 

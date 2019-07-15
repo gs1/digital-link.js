@@ -25,6 +25,7 @@ const DATA = {
   },
   url: 'https://gs1.evrythng.com/01/9780345418913/10/38737643/21/58943?15=230911&thngId=U5mQKGDpnymBwQwRakyBqeYh',
   jsonString: '{"domain":"https://gs1.evrythng.com","identifier":{"01":"9780345418913"},"keyQualifiers":{"10":"38737643","21":"58943"},"attributes":{"15":"230911","thngId":"U5mQKGDpnymBwQwRakyBqeYh"}}',
+  compressedWebUri: 'https://gs1.evrythng.com/HxHKVAdpQhCTxbrOF_yEFcx_4a2GeAh1mFOZkChg6Z8pgcEMEWpMganmIQ',
 };
 
 const createUsingSetters = () => {
@@ -62,9 +63,14 @@ const createUsingChain = () => DigitalLink()
   .setAttribute(DATA.customAttribute.key, DATA.customAttribute.value);
 
 describe('Exports', () => {
-  it('should export a creation function', () => {
+  it('should export DigitalLink', () => {
     expect(DigitalLink).to.be.a('function');
     expect(() => DigitalLink()).to.not.throw();
+  });
+
+  it('should export Utils.Rules', () => {
+    expect(Utils.Rules).to.be.an('object');
+    expect(Object.keys(Utils.Rules).length).to.equal(29);
   });
 
   it('should export Utils.testRule', () => {
@@ -79,9 +85,20 @@ describe('Exports', () => {
     expect(Utils.generateTraceHtml).to.be.a('function');
   });
 
-  it('should export Utils.Rules', () => {
-    expect(Utils.Rules).to.be.an('object');
-    expect(Object.keys(Utils.Rules).length).to.equal(29);
+  it('should export Utils.generateResultsHtml', () => {
+    expect(Utils.generateResultsHtml).to.be.a('function');
+  });
+
+  it('should export Utils.compressWebUri', () => {
+    expect(Utils.compressWebUri).to.be.a('function');
+  });
+
+  it('should export Utils.decompressWebUri', () => {
+    expect(Utils.decompressWebUri).to.be.a('function');
+  });
+
+  it('should export Utils.isCompressedWebUri', () => {
+    expect(Utils.isCompressedWebUri).to.be.a('function');
   });
 });
 
@@ -149,6 +166,13 @@ describe('DigitalLink', () => {
       expect(dl.getAttribute('thngId')).to.equal('U5mQKGDpnymBwQwRakyBqeYh');
     });
 
+    it('should create from string - compressed URI', () => {
+      const dl = DigitalLink(DATA.compressedWebUri);
+      const expected = 'https://gs1.evrythng.com/01/09780345418913/10/38737643/21/58943?15=230911&thngId=U5mQKGDpnymBwQwRakyBqeYh'
+
+      expect(dl.toWebUriString()).to.equal(expected);
+    });
+
     it('should produce the same regardless of construction method', () => {
       const expected = createUsingSetters().toWebUriString();
       expect(createUsingObject().toWebUriString()).to.equal(expected);
@@ -160,6 +184,14 @@ describe('DigitalLink', () => {
     it('should not allow access to underlying data', () => {
       const dl = DigitalLink(DATA.url);
       expect(dl.model).to.equal(undefined);
+    });
+
+    it('should construct with invalid uncompressed input', () => {
+      // Including a partially constructed URI
+      const partial = 'https://gs1.evrythng.com/01/123';
+
+      expect(() => DigitalLink(partial)).to.not.throw();
+      expect(DigitalLink(partial).isValid()).to.equal(false);
     });
   });
 
@@ -234,6 +266,57 @@ describe('DigitalLink', () => {
     });
   });
 
+  describe('Setters', () => {
+    const dl = DigitalLink();
+
+    it('should set the domain', () => {
+      const input = 'https://gs1.evrythng.com';
+
+      expect(() => dl.setDomain(input)).to.not.throw();
+      expect(dl.getDomain()).to.equal(input);
+    });
+
+    it('should set the identifier', () => {
+      const ai = '01';
+      const value = '09780345418913';
+
+      expect(() => dl.setIdentifier(ai, value)).to.not.throw();
+      expect(dl.getIdentifier()).to.deep.equal({ [ai]: value });
+    });
+
+    it('should set a key qualifier', () => {
+      const ai = '21';
+      const value = '36527';
+
+      expect(() => dl.setKeyQualifier(ai, value)).to.not.throw();
+      expect(dl.getKeyQualifier(ai)).to.equal(value);
+    });
+
+    it('should set an attribute', () => {
+      const key = 'thngId';
+      const value = 'U5mQKGDpnymBwQwRakyBqeYh';
+
+      expect(() => dl.setAttribute(key, value)).to.not.throw();
+      expect(dl.getAttribute(key)).to.equal(value);
+    });
+
+    it('should throw for an invalid domain type', () => {
+      expect(() => dl.setDomain({ url: 'https://gs1.evrythng.com'})).to.throw();
+    });
+
+    it('should throw for an invalid identifier type', () => {
+      expect(() => dl.setIdentifier({ '01': '9780345418913' })).to.throw();
+    });
+
+    it('should throw for an invalid key qualifier type', () => {
+      expect(() => dl.setKeyQualifier({ '21': '36527' })).to.throw();
+    });
+
+    it('should throw for an invalid attribute type', () => {
+      expect(() => dl.setAttribute({ 'thngId': 'U5mQKGDpnymBwQwRakyBqeYh' })).to.throw();
+    });
+  });
+
   describe('Generation', () => {
     it('should generate the correct URL string', () => {
       expect(createUsingSetters().toWebUriString()).to.equal(DATA.url);
@@ -242,11 +325,20 @@ describe('DigitalLink', () => {
     it('should generate the correct JSON string', () => {
       expect(createUsingSetters().toJsonString()).to.equal(DATA.jsonString);
     });
+
+    it('should generate the correct compressed web URI string', () => {
+      expect(createUsingSetters().toCompressedWebUriString()).to.equal(DATA.compressedWebUri);
+    });
   });
 
   describe('Validation', () => {
     it('should validate using the grammar', () => {
       expect(createUsingSetters().isValid()).to.equal(true);
+    });
+
+    it('should transparently validate a valid compressed URI', () => {
+      const dl = DigitalLink('https://dlnkd.tn.gg/ARHKVAdpQg');
+      expect(dl.isValid()).to.equal(true);
     });
 
     it('should parse a valid URL trace history', () => {
@@ -297,6 +389,58 @@ describe('DigitalLink', () => {
   });
 });
 
+describe('Compression', () => {
+  it('should compress a Digital Link URI', () => {
+    const input = 'https://dlnkd.tn.gg/gtin/09780345418913/lot/231/ser/345345?15=120820';
+    const expected = 'https://dlnkd.tn.gg/HxHKVAdpQgZzjr-hCDKigI';
+
+    expect(Utils.compressWebUri(input)).to.equal(expected);
+  });
+
+  it('should decompress a compressed Digital Link URI', () => {
+    const input = 'https://dlnkd.tn.gg/HxHKVAdpQgZzjr-hCDKigI';
+    const expected = 'https://dlnkd.tn.gg/01/09780345418913/10/231/21/345345?15=120820';
+
+    expect(Utils.decompressWebUri(input)).to.equal(expected);
+  });
+
+  it('should decompress a compressed Digital Link URI using short AI names', () => {
+    const input = 'https://dlnkd.tn.gg/HxHKVAdpQgZzjr-hCDKigI';
+    const expected = 'https://dlnkd.tn.gg/gtin/09780345418913/lot/231/ser/345345?15=120820';
+
+    expect(Utils.decompressWebUri(input, true)).to.equal(expected);
+  });
+
+  it('should detect a compressed Digital Link URI', () => {
+    const input = 'https://dlnkd.tn.gg/HxHKVAdpQgZzjr-hCDKigI';
+
+    expect(Utils.isCompressedWebUri(input)).to.equal(true);
+  });
+
+  it('should detect an uncompressed Digital Link URI', () => {
+    const input = 'https://dlnkd.tn.gg/gtin/09780345418913/lot/231/ser/345345?15=120820';
+
+    expect(Utils.isCompressedWebUri(input)).to.equal(false);
+  });
+
+  it('should use optimisations and compress other key-value pairs by default', () => {
+    const input = 'https://dlnkd.tn.gg/01/9780345418913/21/43786?foo=bar';
+    const expected = 'https://dlnkd.tn.gg/DBHKVAdpQgqrCvBv0UMG21W';
+
+    expect(Utils.compressWebUri(input)).to.equal(expected);
+  });
+
+  it('should allow not using optimisations and compressing other key-value pairs', () => {
+    const input = 'https://dlnkd.tn.gg/01/9780345418913/21/43786?foo=bar';
+    const expected = 'https://dlnkd.tn.gg/ARHKVAdpQkIKqwo?foo=bar';
+    const useOptimisations = false;
+    const compressOtherKeyValuePairs = false;
+    const result = Utils.compressWebUri(input, useOptimisations, compressOtherKeyValuePairs);
+
+    expect(result).to.equal(expected);
+  });
+});
+
 describe('Utils', () => {
   it('should validate some rules', () => {
     expect(Utils.testRule(Utils.Rules.gtin, '9780345418913')).to.equal(true);
@@ -307,6 +451,10 @@ describe('Utils', () => {
   it('should not validate when rules are not met', () => {
     expect(Utils.testRule(Utils.Rules.gtin, '9780345418913d')).to.equal(false);
     expect(Utils.testRule(Utils.Rules.ser, '{}')).to.equal(false);
+  });
+
+  it('should throw for an invalid rule name', () => {
+    expect(() => Utils.testRule('foo', '83479347')).to.throw();
   });
 
   it('should generate some stats HTML', () => {

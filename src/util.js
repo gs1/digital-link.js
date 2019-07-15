@@ -1,7 +1,7 @@
 const apglib = require('apg-lib');
-const { grammarObject } = require('./grammar');
+const { grammarObject: GrammarObject } = require('../lib/grammarObject');
 
-const GRAMMAR = new grammarObject();
+const GRAMMAR = new GrammarObject();
 
 /**
  * Add query param string pairs to the string result so far.
