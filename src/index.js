@@ -2,6 +2,7 @@ const {
   addQueryParams, assertPropertyType, assertStringPair, assignStringPair, validateUrl, validateRule,
   getTrace, generateStatsHtml, generateTraceHtml, generateResultsHtml,
 } = require('./util');
+const { compressWebUri, decompressWebUri, isCompressedWebUri } = require('./compression');
 
 /**
  * Individual parser rules that can be run with `testRule()`.
@@ -111,9 +112,10 @@ const encode = (dl) => {
  * Construct a DigitalLink either from object params, a string, or built using
  * the available setters.
  *
- * @param {(object|string)} opts - Optional construction object or string.
+ * @param {(object|string)} [input] - Optional input construction object or string.
+ * @returns {object} The DigitalLink instance with populated data.
  */
-const DigitalLink = (opts) => {
+const DigitalLink = (input) => {
   // Model should only be manipulated through getters and setters to ensure types are correct
   const model = Symbol('model');
   const result = {
@@ -125,27 +127,27 @@ const DigitalLink = (opts) => {
     },
   };
 
-  if (typeof opts === 'object') {
+  if (typeof input === 'object') {
     // Domain and identifier are required
-    assertPropertyType(opts, 'domain', 'string');
-    result[model].domain = opts.domain;
-    assertPropertyType(opts, 'identifier', 'object');
-    result[model].identifier = opts.identifier;
+    assertPropertyType(input, 'domain', 'string');
+    result[model].domain = input.domain;
+    assertPropertyType(input, 'identifier', 'object');
+    result[model].identifier = input.identifier;
 
     // The rest are optional
-    if (opts.keyQualifiers) {
-      assertPropertyType(opts, 'keyQualifiers', 'object');
-      result[model].keyQualifiers = opts.keyQualifiers;
+    if (input.keyQualifiers) {
+      assertPropertyType(input, 'keyQualifiers', 'object');
+      result[model].keyQualifiers = input.keyQualifiers;
     }
 
-    if (opts.attributes) {
-      assertPropertyType(opts, 'attributes', 'object');
-      result[model].attributes = opts.attributes;
+    if (input.attributes) {
+      assertPropertyType(input, 'attributes', 'object');
+      result[model].attributes = input.attributes;
     }
   }
 
-  if (typeof opts === 'string') {
-    decode(result[model], opts);
+  if (typeof input === 'string') {
+    decode(result[model], isCompressedWebUri(input) ? decompressWebUri(input) : input);
   }
 
   result.setDomain = (domain) => {
@@ -181,6 +183,7 @@ const DigitalLink = (opts) => {
   result.getAttributes = () => result[model].attributes;
 
   result.toWebUriString = () => encode(result[model]);
+  result.toCompressedWebUriString = () => compressWebUri(result.toWebUriString());
   result.toJsonString = () => JSON.stringify(result[model]);
   result.isValid = () => validateUrl(result.toWebUriString());
   result.getValidationTrace = () => getTrace(result.toWebUriString());
@@ -212,5 +215,8 @@ module.exports = {
     generateStatsHtml,
     generateTraceHtml,
     generateResultsHtml,
+    compressWebUri,
+    decompressWebUri,
+    isCompressedWebUri,
   },
 };

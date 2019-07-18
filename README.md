@@ -3,7 +3,7 @@
 Javascript library for creating, verifying, and representing/transferring [GS1 Digital Links](https://evrythng.com/news/upgrading-the-barcode-to-the-web-gs1-digital-link/).
 
 This is the library powering the
-[EVRYTHNG GS1 Digital Link Tools](https://digital-link.evrythng.com) project,
+[GS1 Digital Link Tools](https://digital-link.tools) project,
 which allows easy generation and validation of GS1 Digital Links via a UI.
 
 * [Installation](#installation)
@@ -91,7 +91,7 @@ const dl = DigitalLink()
 A `DigitalLink` object can also be created using an existing string:
 
 ```js
-const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786?thngId=UMwxDXBdUbxgtyRaR2HBrc4r';
+const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
 
 const dl = DigitalLink(uri);
 ```
@@ -164,6 +164,54 @@ The example above contains an erroneous 'x' at the end, so it does not validate:
 ```
 
 
+### Compression
+
+The [GS1 Digital Link 1.1 draft specification](https://www.gs1.org/standards/gs1-digital-link) describes a compression/decompression mechanism that allows for shorter URLs and hence unlocks use cases where the size of the data carrier (e.g., QR code) is very limited.
+
+To create a compressed URI, use the `toCompressedWebUriString()` method:
+
+```js
+const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
+const dl = DigitalLink(uri);
+
+const compressedUri = dl.toCompressedWebUriString();
+```
+
+To attempt decompression of a compressed URI use the constructor function as
+usual:
+
+```js
+const compressedUri = 'https://dlnkd.tn.gg/DBHKVAdpQgqrCg';
+
+const dl = DigitalLink(compressedUri);
+```
+
+> Note: decompression will fail if the result is not a valid GS1 Digital Link.
+
+The `Utils` object also provides methods for direct compression and
+decompression of URI strings:
+
+```js
+const { Utils } = require('digital-link.js');
+
+const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
+
+// Compress a URI
+const compressedUri = Utils.compressWebUri(uri);
+
+// Compress without optimisations or compressing other key-value pairs
+const useOptimisations = false;
+const compressOtherKeyValuePairs = false;
+const semiCompressedUri = Utils.compressWebUri(uri, useOptimisations, compressOtherKeyValuePairs);
+
+// Decompress a compressed URI
+const decompressedUri = Utils.decompressWebUri(compressedUri);
+
+// Detect if a URI is compressed
+const isCompressed = Utils.isCompressedWebUri(compressedUri);
+```
+
+
 ## Test App
 
 ![](test-app/assets/screenshot.png)
@@ -227,3 +275,9 @@ resultsSpan.innerHTML = Utils.generateResultsHtml(dl.toUrlString());
 
 Unit tests can be run with the `npm test` command, and cover all methods,
 creation methods, and output formats.
+
+## Third party libraries
+
+`digital-link.js` was built using some great third party libraries, in particular:
+* [`apglib`](https://github.com/ldthomas/apg-js2-lib) - which is used to verify links based on the standard `ABNF` grammar.
+* [`GS1DigitalLinkCompressionPrototype`](https://github.com/gs1/GS1DigitalLinkCompressionPrototype`) - which is a prototype implementation of the Digital Link compression as specified in the GS1 Digital Link 1.1 draft specification.
