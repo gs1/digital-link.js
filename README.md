@@ -3,7 +3,7 @@
 Javascript library for creating, verifying, and representing/transferring [GS1 Digital Links](https://evrythng.com/news/upgrading-the-barcode-to-the-web-gs1-digital-link/).
 
 This is the library powering the
-[EVRYTHNG GS1 Digital Link Tools](https://digital-link.evrythng.com) project,
+[EVRYTHNG GS1 Digital Link Tools](https://digital-link.tools) project,
 which allows easy generation and validation of GS1 Digital Links via a UI.
 
 * [Installation](#installation)
@@ -166,9 +166,9 @@ The example above contains an erroneous 'x' at the end, so it does not validate:
 
 ### Compression
 
-Since version 1.1.0, compression/decompression of a Digital Link URI can be
-performed. To create a compressed URI, use the `toCompressedWebUriString()`
-method:
+The [GS1 Digital Link 1.1 draft specification](https://www.gs1.org/standards/gs1-digital-link) describes a compression/decompression mechanism that allows for shorter URLs and hence unlocks use cases where the size of the data carrier (e.g., QR code) is very limited.
+
+To create a compressed URI, use the `toCompressedWebUriString()` method:
 
 ```js
 const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
@@ -275,3 +275,9 @@ resultsSpan.innerHTML = Utils.generateResultsHtml(dl.toUrlString());
 
 Unit tests can be run with the `npm test` command, and cover all methods,
 creation methods, and output formats.
+
+## Third party libraries
+
+`digital-link.js` was built using some great third party libraries, in particular:
+* [`apglib`](https://github.com/ldthomas/apg-js2-lib) - which is used to verify links based on the standard `ABNF` grammar.
+* [`GS1DigitalLinkCompressionPrototype`](https://github.com/gs1/GS1DigitalLinkCompressionPrototype`) - which is a prototype implementation of the Digital Link compression as specified in the GS1 Digital Link 1.1 draft specification.
