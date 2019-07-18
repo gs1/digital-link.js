@@ -3,7 +3,7 @@
 Javascript library for creating, verifying, and representing/transferring [GS1 Digital Links](https://evrythng.com/news/upgrading-the-barcode-to-the-web-gs1-digital-link/).
 
 This is the library powering the
-[EVRYTHNG GS1 Digital Link Tools](https://digital-link.tools) project,
+[GS1 Digital Link Tools](https://digital-link.tools) project,
 which allows easy generation and validation of GS1 Digital Links via a UI.
 
 * [Installation](#installation)
