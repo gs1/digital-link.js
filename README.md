@@ -280,4 +280,4 @@ creation methods, and output formats.
 
 `digital-link.js` was built using some great third party libraries, in particular:
 * [`apglib`](https://github.com/ldthomas/apg-js2-lib) - which is used to verify links based on the standard `ABNF` grammar.
-* [`GS1DigitalLinkCompressionPrototype`](https://github.com/gs1/GS1DigitalLinkCompressionPrototype`) - which is a prototype implementation of the Digital Link compression as specified in the GS1 Digital Link 1.1 draft specification.
+* [`GS1DigitalLinkCompressionPrototype`](https://github.com/gs1/GS1DigitalLinkCompressionPrototype) - which is a prototype implementation of the Digital Link compression as specified in the GS1 Digital Link 1.1 draft specification.
