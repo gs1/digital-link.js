@@ -16,7 +16,7 @@ which allows easy generation and validation of GS1 Digital Links via a UI.
 
 ## Installation
 
-## Node.js or bundler
+### Node.js or bundler
 
 Install via `npm`:
 
@@ -31,7 +31,7 @@ const { DigitalLink, Utils } = require('digital-link.js');
 ```
 
 
-## Script tag
+### Script tag
 
 Add a `<script>` tag to your HTML page:
 
