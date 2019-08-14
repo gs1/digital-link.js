@@ -4,14 +4,21 @@
   "description": "An SDK for creating and validating GS1 Digital Link URLs and objects.",
   "main": "src/index.js",
   "scripts": {
+    "build": "webpack --config webpack.config.js --mode production",
+    "build-dev": "webpack --config webpack.config.js --mode development",
     "test": "nyc mocha tests/index.js && rm -rf .nyc_output"
   },
   "author": "EVRYTHNG",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
     "chai": "^4.1.2",
     "mocha": "^5.2.0",
-    "nyc": "^14.1.1"
+    "nyc": "^14.1.1",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6"
   },
   "dependencies": {
     "apg-lib": "^3.2.0"

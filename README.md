@@ -1,6 +1,7 @@
 # digital-link.js
 
-Javascript library for creating, verifying, and representing/transferring [GS1 Digital Links](https://evrythng.com/news/upgrading-the-barcode-to-the-web-gs1-digital-link/).
+Javascript library for creating, verifying, and representing/transferring
+[GS1 Digital Links](https://evrythng.com/news/upgrading-the-barcode-to-the-web-gs1-digital-link/).
 
 This is the library powering the
 [GS1 Digital Link Tools](https://digital-link.tools) project,
@@ -15,8 +16,34 @@ which allows easy generation and validation of GS1 Digital Links via a UI.
 
 ## Installation
 
-1. `npm i --save digital-link.js`
-2. `require` it as shown below.
+## Node.js or bundler
+
+Install via `npm`:
+
+```bash
+$ npm i --save digital-link.js
+```
+
+Then `require` it in code:
+
+```js
+const { DigitalLink, Utils } = require('digital-link.js');
+```
+
+
+## Script tag
+
+Add a `<script>` tag to your HTML page:
+
+```html
+<script src="https://d10ka0m22z5ju5.cloudfront.net/js/digital-link.js/1.1.0/digital-link.js-1.1.0.js"></script>
+```
+
+Then access the `digitalLinkJs` global variable:
+
+```js
+const { DigitalLink, Utils } = digitalLinkJs;
+```
 
 
 ## Usage
@@ -166,7 +193,11 @@ The example above contains an erroneous 'x' at the end, so it does not validate:
 
 ### Compression
 
-The [GS1 Digital Link 1.1 draft specification](https://www.gs1.org/standards/gs1-digital-link) describes a compression/decompression mechanism that allows for shorter URLs and hence unlocks use cases where the size of the data carrier (e.g., QR code) is very limited.
+The
+[GS1 Digital Link 1.1 draft specification](https://www.gs1.org/standards/gs1-digital-link)
+describes a compression/decompression mechanism that allows for shorter URLs and
+hence unlocks use cases where the size of the data carrier (e.g., QR code) is
+very limited.
 
 To create a compressed URI, use the `toCompressedWebUriString()` method:
 
@@ -278,6 +309,16 @@ creation methods, and output formats.
 
 ## Third party libraries
 
-`digital-link.js` was built using some great third party libraries, in particular:
-* [`apglib`](https://github.com/ldthomas/apg-js2-lib) - which is used to verify links based on the standard `ABNF` grammar.
-* [`GS1DigitalLinkCompressionPrototype`](https://github.com/gs1/GS1DigitalLinkCompressionPrototype) - which is a prototype implementation of the Digital Link compression as specified in the GS1 Digital Link 1.1 draft specification.
+`digital-link.js` was built using some great third party libraries, in
+particular:
+
+* [`apglib`](https://github.com/ldthomas/apg-js2-lib) - which is used to verify
+  links based on the standard `ABNF` grammar.
+* [`GS1DigitalLinkCompressionPrototype`](https://github.com/gs1/GS1DigitalLinkCompressionPrototype) -
+  which is a prototype implementation of the Digital Link compression as
+  specified in the GS1 Digital Link 1.1 draft specification.
+
+
+## Deployment
+
+See `jenkins` for deployment instructions.
