@@ -1,0 +1,641 @@
+;; GS1 Digital Link Web URI Grammar
+;; Corresponding to version 1.1 of the GS1 Digital Link standard
+
+DIGIT			= "0" / "1" / "2" / "3" / "4" /
+		 	 "5" / "6" / "7" / "8" / "9"
+
+UPPERALPHA		= %x41-5A ; A-Z  ( ASCII characters 65-90 decimal, 41-5A hex)
+
+LOWERALPHA		= %x61-7A ; a-z  ( ASCII characters 97-122 decimal, 61-7A hex)
+
+ALPHA			= UPPERALPHA / LOWERALPHA ; A-Z or a-z
+
+HEXDIG			= DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+
+DoubleQuote 		= '"' ; the double-quote character "
+
+Octothorpe		= "%23" ; percent-encoding of the # character
+ForwardSlash		= "%2F" ; percent-encoding of the / character
+
+Percent			= "%25" ; percent-encoding of the % character
+Ampersand		= "%26" ; percent-encoding of the & character
+Plus			= "%2B" ; percent-encoding of the + character
+Comma			= "%2C" ; percent-encoding of the , character
+
+Exclamation		= "%21" ; percent-encoding of the ! character
+LeftBracket		= "%28" ; percent-encoding of the ( character
+RightBracket		= "%29" ; percent-encoding of the ) character
+Asterisk		= "%2A" ; percent-encoding of the * character
+
+Apostrophe		= "%27" ; percent-encoding of the ' character
+Colon			= "%3A" ; percent-encoding of the : character
+Semicolon		= "%3B" ; percent-encoding of the ; character
+LeftAngleBracket	= "%3C" ; percent-encoding of the < character
+Equals			= "%3D" ; percent-encoding of the = character
+RightAngleBracket	= "%3E" ; percent-encoding of the > character
+QuestionMark		= "%3F" ; percent-encoding of the ? character
+
+
+XSYMBOL 		= DoubleQuote / "-" / "." / "_" / Exclamation / Percent /
+			  Ampersand / Plus / Comma / ForwardSlash / Asterisk /
+			  LeftBracket / RightBracket / Apostrophe / Semicolon / Colon /
+			  LeftAngleBracket / RightAngleBracket / Equals / QuestionMark
+
+YSYMBOL 		= "-" / Octothorpe / ForwardSlash
+
+XCHAR 			= DIGIT / UPPERALPHA / LOWERALPHA / XSYMBOL
+
+YCHAR 			= DIGIT / UPPERALPHA / YSYMBOL
+
+gtin-code		= "01"		/ %s"gtin"		; GTIN
+itip-code		= "8006"	/ %s"itip"		; ITIP
+gmn-code		= "8013"	/ %s"gmn"		; Global Model Number
+cpid-code		= "8010"	/ %s"cpid"		; CPID
+shipTo-code 		= "410"	/ %s"shipTo"		; ship-to
+billTo-code 		= "411"	/ %s"billTo"		; bill-to
+purchasedFrom-code	= "412"	/ %s"purchasedFrom"	; ship-to
+shipFor-code		= "413"	/ %s"shipFor"		; ship-for
+gln-code 		= "414"	/ %s"gln"		; Physical Location GLN
+payTo-code 		= "415"	/ %s"payTo"		; GLN of invoicing party
+glnProd-code 		= "416"	/ %s"glnProd"		; GLN of production/service loc.
+gsrnp-code 		= "8017"	/ %s"gsrnp"		; GSRN of the Provider
+gsrn-code 		= "8018"	/ %s"gsrn"		; GSRN of the Recipient
+gcn-code 		= "255"	/ %s"gcn"		; GCN
+sscc-code 		= "00"		/ %s"sscc"		; SSCC
+gdti-code 		= "253"	/ %s"gdti"		; GDTI
+ginc-code 		= "401"	/ %s"ginc"		; GINC
+gsin-code 		= "402"	/ %s"gsin"		; GSIN
+grai-code 		= "8003"	/ %s"grai"		; GRAI
+giai-code 		= "8004"	/ %s"giai"		; GIAI
+
+cpv-code 		= "22"		/ %s"cpv"   ; Consumer Product Variant
+lot-code 		= "10"		/ %s"lot"   ; Batch/Lot identifier
+ser-code 		= "21"		/ %s"ser"   ; GTIN Serial Number
+cpsn-code 		= "8011"	/ %s"cpsn"  ; CPID Serial Number
+glnx-code 		= "254"	/ %s"glnx"  ; GLN extension
+refno-code		= "8020"	/ %s"refno" ; Payment Reference Number
+srin-code 		= "8019"	/ %s"srin"  ; Service Relation Instance Number
+
+gtin-value		= 14DIGIT / 13DIGIT / 12DIGIT / 8DIGIT
+itip-value		= 14DIGIT 2DIGIT 2DIGIT
+				; 14 digits then 2 digits then 2 digits
+gmn-value 		= 1*30XCHAR  ; 1-30 characters from 82-chr subset
+cpid-value 		= 1*30YCHAR  ; 1-30 characters from 39-chr subset
+shipTo-value 		= 13DIGIT   ; exactly 13 digits
+billTo-value 		= 13DIGIT   ; exactly 13 digits
+purchasedFrom-value 	= 13DIGIT   ; exactly 13 digits
+shipFor-value 		= 13DIGIT   ; exactly 13 digits
+gln-value 		= 13DIGIT   ; exactly 13 digits
+payTo-value 		= 13DIGIT   ; exactly 13 digits
+glnProd-value 		= 13DIGIT   ; exactly 13 digits
+gsrnp-value 		= 18DIGIT   ; exactly 18 digits
+gsrn-value 		= 18DIGIT   ; exactly 18 digits
+gcn-value 		= 13DIGIT 1*12DIGIT  ; 13 digits then 1-12 digits
+sscc-value 		= 18DIGIT   ; exactly 18 digits
+gdti-value 		= 13DIGIT 1*17XCHAR
+				; 13 digits then 1-17 characters
+				; from the 82-character subset
+ginc-value 		= 1*30XCHAR
+				; 1-30 characters from the 82-character subset
+gsin-value 		= 17DIGIT   ; exactly 17 digits
+grai-value 		= 14DIGIT 1*16XCHAR
+				; 14 digits then 1-16 characters
+				; from the 82-character subset of ISO/IEC 646
+giai-value 		= 1*30XCHAR  ; 1-30 characters from 82-chr subset
+
+cpv-value		= 1*20XCHAR  ; 1-20 characters from 82-chr subset
+lot-value		= 1*20XCHAR  ; 1-20 characters from 82-chr subset
+ser-value		= 1*20XCHAR  ; 1-20 characters from 82-chr subset
+cpsn-value		= 1*12DIGIT  ; 1-12 digits
+glnx-value		= 1*20XCHAR  ; 1-20 characters from 82-chr subset
+refno-value 		= 1*25XCHAR  ; 1-25 characters from 82-chr subset
+srin-value 		= 1*10DIGIT  ; 1-10 digits
+
+gtin-comp	 	= "/" gtin-code "/" gtin-value
+itip-comp 	 	= "/" itip-code "/" itip-value
+gmn-comp 	 	= "/" gmn-code "/" gmn-value
+cpid-comp 	 	= "/" cpid-code "/" cpid-value
+shipTo-comp	 	= "/" shipTo-code "/" shipTo-value
+billTo-comp	 	= "/" billTo-code "/" billTo-value
+purchasedFrom-comp	= "/" purchasedFrom-code "/" purchasedFrom-value
+shipFor-comp	 	= "/" shipFor-code "/" shipFor-value
+gln-comp 	 	= "/" gln-code "/" gln-value
+payTo-comp	 	= "/" payTo-code "/" payTo-value
+glnProd-comp	 	= "/" glnProd-code "/" glnProd-value
+gsrnp-comp	 	= "/" gsrnp-code "/" gsrnp-value
+gsrn-comp	 	= "/" gsrn-code "/" gsrn-value
+gcn-comp 	 	= "/" gcn-code "/" gcn-value
+sscc-comp 	 	= "/" sscc-code "/" sscc-value
+gdti-comp 	 	= "/" gdti-code "/" gdti-value
+ginc-comp 	 	= "/" ginc-code "/" ginc-value
+gsin-comp 	 	= "/" gsin-code "/" gsin-value
+grai-comp 	 	= "/" grai-code "/" grai-value
+giai-comp 	 	= "/" giai-code "/" giai-value
+
+cpv-comp 	 	= "/" cpv-code "/" cpv-value
+lot-comp 	 	= "/" lot-code "/" lot-value
+ser-comp 	 	= "/" ser-code "/" ser-value
+cpsn-comp 	 	= "/" cpsn-code "/" cpsn-value
+glnx-comp 	 	= "/" glnx-code "/" glnx-value
+refno-comp	 	= "/" refno-code "/" refno-value
+srin-comp 	 	= "/" srin-code "/" srin-value
+
+gtin-path 		= gtin-comp  [cpv-comp] [lot-comp] [ser-comp]
+itip-path 		= itip-comp  [cpv-comp] [lot-comp] [ser-comp]
+gmn-path 		= gmn-comp
+cpid-path 		= cpid-comp  [cpsn-comp]
+shipTo-path		= shipTo-comp
+billTo-path		= billTo-comp
+purchasedFrom-path	= purchasedFrom-comp
+shipFor-path		= shipFor-comp
+gln-path 		= gln-comp   [glnx-comp]
+payTo-path		= payTo-comp
+glnProd-path		= glnProd-comp
+gsrnp-path		= gsrnp-comp [srin-comp]
+gsrn-path 		= gsrn-comp  [srin-comp]
+gcn-path 		= gcn-comp
+sscc-path 		= sscc-comp
+gdti-path 		= gdti-comp
+ginc-path 		= ginc-comp
+gsin-path 		= gsin-comp
+grai-path 		= grai-comp
+giai-path 		= giai-comp
+
+gs1path 		= gtin-path / itip-path / gmn-path / cpid-path / shipTo-path /
+			  billTo-path / purchasedFrom-path / shipFor-path / gln-path /
+			  payTo-path / glnProd-path / gsrnp-path / gsrn-path / gcn-path /
+			  sscc-path / gdti-path / ginc-path / gsin-path / grai-path / giai-path
+
+netWeightVMTICode 	= "3100" / "3101" / "3102" / "3103" / "3104" / "3105" /
+			   "3200" / "3201" / "3202" / "3203" / "3204" / "3205" /
+			   "3560" / "3561" / "3562" / "3563" / "3564" / "3565" /
+			   "3570" / "3571" / "3572" / "3573" / "3574" / "3575"
+netWeightVMTIValue	= 6DIGIT
+netWeightVMTIParameter	= netWeightVMTICode "=" netWeightVMTIValue
+
+lengthVMTICode 		= "3110" / "3111" / "3112" / "3113" / "3114" / "3115" /
+				  "3210" / "3211" / "3212" / "3213" / "3214" / "3215" /
+				  "3220" / "3221" / "3222" / "3223" / "3224" / "3225" /
+				  "3230" / "3231" / "3232" / "3233" / "3234" / "3235"
+lengthVMTIValue 	= 6DIGIT
+lengthVMTIParameter	= lengthVMTICode "=" lengthVMTIValue
+
+widthVMTICode 		= "3120" / "3121" / "3122" / "3123" / "3124" / "3125" /
+				  "3240" / "3241" / "3242" / "3243" / "3244" / "3245" /
+				  "3250" / "3251" / "3252" / "3253" / "3254" / "3255" /
+				  "3260" / "3261" / "3262" / "3263" / "3264" / "3265"
+widthVMTIValue 		= 6DIGIT
+widthVMTIParameter 	= widthVMTICode "=" widthVMTIValue
+
+depthVMTICode 		= "3130" / "3131" / "3132" / "3133" / "3134" / "3135" /
+				  "3270" / "3271" / "3272" / "3273" / "3274" / "3275" /
+				  "3280" / "3281" / "3282" / "3283" / "3284" / "3285" /
+				  "3290" / "3291" / "3292" / "3293" / "3294" / "3295"
+depthVMTIValue 		= 6DIGIT
+depthVMTIParameter 	= depthVMTICode "=" depthVMTIValue
+
+areaVMTICode 		= "3140" / "3141" / "3142" / "3143" / "3144" / "3145" /
+				  "3500" / "3501" / "3502" / "3503" / "3504" / "3505" /
+				  "3510" / "3511" / "3512" / "3513" / "3514" / "3515" /
+				  "3520" / "3521" / "3522" / "3523" / "3524" / "3525"
+areaVMTIValue 		= 6DIGIT
+areaVMTIParameter 	= areaVMTICode "=" areaVMTIValue
+
+netVolumeVMTICode 	= "3150" / "3151" / "3152" / "3153" / "3154" / "3155" /
+				  "3160" / "3161" / "3162" / "3163" / "3164" / "3165" /
+				  "3600" / "3601" / "3602" / "3603" / "3604" / "3605" /
+				  "3610" / "3611" / "3612" / "3613" / "3614" / "3615" /
+				  "3640" / "3641" / "3642" / "3643" / "3644" / "3645" /
+				  "3650" / "3651" / "3652" / "3653" / "3654" / "3655" /
+				  "3660" / "3661" / "3662" / "3663" / "3664" / "3665"
+netVolumeVMTIValue 	= 6DIGIT
+netVolumeVMTIParameter 	= netVolumeVMTICode "=" netVolumeVMTIValue
+
+
+massPerUnitAreaVMTICode 	= "3370" / "3371" / "3372" / "3373" / "3374" / "3375"
+massPerUnitAreaVMTIValue 	= 6DIGIT
+massPerUnitAreaVMTIParameter	= massPerUnitAreaVMTICode "=" massPerUnitAreaVMTIValue
+
+
+grossWeightCode 		= "3300" / "3301" / "3302" / "3303" / "3304" / "3305" /
+				  "3400" / "3401" / "3402" / "3403" / "3404" / "3405"
+grossWeightValue 		= 6DIGIT
+grossWeightParameter 		= grossWeightCode "=" grossWeightValue
+
+logisticLengthCode 		= "3310" / "3311" / "3312" / "3313" / "3314" / "3315" /
+				  "3410" / "3411" / "3412" / "3413" / "3414" / "3415" /
+				  "3420" / "3421" / "3422" / "3423" / "3424" / "3425" /
+				  "3430" / "3431" / "3432" / "3433" / "3434" / "3435"
+logisticLengthValue 		= 6DIGIT
+logisticLengthParameter		= logisticLengthCode "=" logisticLengthValue
+
+logisticWidthCode 		= "3320" / "3321" / "3322" / "3323" / "3324" / "3325" /
+				  "3440" / "3441" / "3442" / "3443" / "3444" / "3445" /
+				  "3450" / "3451" / "3452" / "3453" / "3454" / "3455" /
+				  "3460" / "3461" / "3462" / "3463" / "3464" / "3465"
+logisticWidthValue 		= 6DIGIT
+logisticWidthParameter 		= logisticWidthCode "=" logisticWidthValue
+
+logisticDepthCode 		= "3330" / "3331" / "3332" / "3333" / "3334" / "3335" /
+				  "3470" / "3471" / "3472" / "3473" / "3474" / "3475" /
+				  "3480" / "3481" / "3482" / "3483" / "3484" / "3485" /
+				  "3490" / "3491" / "3492" / "3493" / "3494" / "3495"
+logisticDepthValue 		= 6DIGIT
+logisticDepthParameter 		= logisticDepthCode "=" logisticDepthValue
+
+logisticAreaCode 		= "3340" / "3341" / "3342" / "3343" / "3344" / "3345" /
+				  "3530" / "3531" / "3532" / "3533" / "3534" / "3535" /
+				  "3540" / "3541" / "3542" / "3543" / "3544" / "3545" /
+				  "3550" / "3551" / "3552" / "3553" / "3554" / "3555"
+logisticAreaValue 		= 6DIGIT
+logisticAreaParameter 		= logisticAreaCode "=" logisticAreaValue
+
+logisticVolumeCode 		= "3350" / "3351" / "3352" / "3353" / "3354" / "3355" /
+				  "3360" / "3361" / "3362" / "3363" / "3364" / "3365" /
+				  "3620" / "3621" / "3622" / "3623" / "3624" / "3625" /
+				  "3630" / "3631" / "3632" / "3633" / "3634" / "3635" /
+				  "3670" / "3671" / "3672" / "3673" / "3674" / "3675" /
+				  "3680" / "3681" / "3682" / "3683" / "3684" / "3685" /
+				  "3690" / "3691" / "3692" / "3693" / "3694" / "3695"
+logisticVolumeValue 		= 6DIGIT
+logisticVolumeParameter 	= logisticVolumeCode "=" logisticVolumeValue
+
+processorCode 			= "7030" / "7031" / "7032" / "7033" / "7034" / "7035" /
+				  "7036" / "7037" / "7038" / "7039"
+processorValue 	   		= 3DIGIT   1*27XCHAR
+processorParameter 		= processorCode "=" processorValue
+
+contentCode 			= "02"
+contentValue 			= 14DIGIT
+contentParameter 		= contentCode "=" contentValue
+
+prodDateCode 			= "11"
+prodDateValue 			= 6DIGIT
+prodDateParameter 		= prodDateCode "=" prodDateValue
+
+dueDateCode 			= "12"
+dueDateValue 			= 6DIGIT
+dueDateParameter 		= dueDateCode "=" dueDateValue
+
+packDateCode 			= "13"
+packDateValue 			= 6DIGIT
+packDateParameter 		= packDateCode "=" packDateValue
+
+bestBeforeDateCode 		= "15"
+bestBeforeDateValue 		= 6DIGIT
+bestBeforeDateParameter 	= bestBeforeDateCode "=" bestBeforeDateValue
+
+sellByDateCode 			= "16"
+sellByDateValue 		= 6DIGIT
+sellByDateParameter 		= sellByDateCode "=" sellByDateValue
+
+firstFreezeDateCode 		= "7006"
+firstFreezeDateValue 		= 6DIGIT
+firstFreezeDateParameter 	= firstFreezeDateCode "=" firstFreezeDateValue
+
+harvestDateCode 		= "7007"
+harvestDateValue 		= 6*12DIGIT
+harvestDateParameter 		= harvestDateCode "=" harvestDateValue
+
+pricePerUnitCode 		= "8005"
+pricePerUnitValue 		= 6DIGIT
+pricePerUnitParameter 		= pricePerUnitCode "=" pricePerUnitValue
+
+variantCode 			= "20"
+variantValue 			= 2DIGIT
+variantParameter 		= variantCode "=" variantValue
+
+varCountCode 			= "30"
+varCountValue 			= 1*8DIGIT
+varCountParameter 		= varCountCode "=" varCountValue
+
+countCode 			= "37"
+countValue 			= 1*8DIGIT
+countParameter 			= countCode "=" countValue
+
+mutualCode 			= "90"
+mutualValue 			= 1*30DIGIT
+mutualParameter 		= mutualCode "=" mutualValue
+
+additionalIdCode 		= "240"
+additionalIdValue 		= 1*30DIGIT
+additionalIdParameter 		= additionalIdCode "=" additionalIdValue
+
+custPartNoCode 			= "241"
+custPartNoValue 		= 1*30DIGIT
+custPartNoParameter 		= custPartNoCode "=" custPartNoValue
+
+mtoVariantCode 			= "242"
+mtoVariantValue 		= 6DIGIT
+mtoVariantParameter 		= mtoVariantCode "=" mtoVariantValue
+
+pcnCode 			= "243"
+pcnValue 			= 1*20DIGIT
+pcnParameter 			= pcnCode "=" pcnValue
+
+secondarySerialCode 		= "250"
+secondarySerialValue 		= 1*30DIGIT
+secondarySerialParameter	= secondarySerialCode "=" secondarySerialValue
+
+refToSourceCode 		= "251"
+refToSourceValue 		= 1*30DIGIT
+refToSourceParameter 		= refToSourceCode "=" refToSourceValue
+
+amountCode 			= "3900" / "3901" / "3902" / "3903" / "3904" / "3905"
+amountValue 			= 1*15DIGIT
+amountParameter 		= amountCode "=" amountValue
+
+amountISOCode 			= "3910" / "3911" / "3912" / "3913" / "3914" / "3915"
+amountISOValue 			= 3DIGIT 1*15DIGIT
+amountISOParameter 		= amountISOCode "=" amountISOValue
+
+priceCode 			= "3920" / "3921" / "3922" / "3923" / "3924" / "3925"
+priceValue 			= 1*15DIGIT
+priceParameter 			= priceCode "=" priceValue
+
+priceISOCode 			= "3930" / "3931" / "3932" / "3933" / "3934" / "3935"
+priceISOValue 			= 3DIGIT  1*15DIGIT
+priceISOParameter 		= priceISOCode "=" priceISOValue
+
+percentOffCode 			= "3940" / "3941" / "3942" / "3943" / "3944" / "3945"
+percentOffValue 		= 4DIGIT
+percentOffParameter 		= percentOffCode "=" percentOffValue
+
+orderNumberCode 		= "400"
+orderNumberValue 		= 1*30DIGIT
+orderNumberParameter 		= orderNumberCode "=" orderNumberValue
+
+routeCode 			= "403"
+routeValue 			= 1*30DIGIT
+routeParameter 			= routeCode "=" routeValue
+
+shipToLocCode 			= "410"
+shipToLocValue 			= 13DIGIT
+shipToLocParameter 		= shipToLocCode "=" shipToLocValue
+
+billToCode 			= "411"
+billToValue 			= 13DIGIT
+billToParameter 		= billToCode "=" billToValue
+
+purchaseFromCode 		= "412"
+purchaseFromValue 		= 13DIGIT
+purchaseFromParameter 		= purchaseFromCode "=" purchaseFromValue
+
+shipForLocCode 			= "413"
+shipForLocValue 		= 13DIGIT
+shipForLocParameter 		= shipForLocCode "=" shipForLocValue
+
+locNoCode 			= "414"
+locNoValue 			= 13DIGIT
+locNoParameter 			= locNoCode "=" locNoValue
+
+payToCode 			= "414"
+payToValue 			= 13DIGIT
+payToParameter 			= payToCode "=" payToValue
+
+prodServLocCode 		= "416"
+prodServLocValue 		= 13DIGIT
+prodServLocParameter 		= prodServLocCode "=" prodServLocValue
+
+shipToPostCode 			= "420"
+shipToPostValue 		= 1*20XCHAR
+shipToPostParameter 		= shipToPostCode "=" shipToPostValue
+
+shipToPostISOCode 		= "421"
+shipToPostISOValue 		= 3DIGIT 1*9XCHAR
+shipToPostISOParameter 		= shipToPostISOCode "=" shipToPostISOValue
+
+originCode 			= "422"
+originValue 			= 3DIGIT
+originParameter 		= originCode "=" originValue
+
+countryProcessCode 		= "424"
+countryProcessValue 		= 3DIGIT
+countryProcessParameter		= countryProcessCode "=" countryProcessValue
+
+countryFullProcessCode		= "426"
+countryFullProcessValue		= 3DIGIT
+countryFullProcessParameter 	= countryFullProcessCode "=" countryFullProcessValue
+
+countryInitialProcessCode	= "423"
+countryInitialProcessValue 	= 3DIGIT 1*12DIGIT
+countryInitialProcessParameter	= countryInitialProcessCode "=" countryInitialProcessValue
+
+countryDisassemblyCode 		= "425"
+countryDisassemblyValue 	= 3DIGIT 1*12DIGIT
+countryDisassemblyParameter 	= countryDisassemblyCode "=" countryDisassemblyValue
+
+originSubdivisionCode 		= "427"
+originSubdivisionValue 		= 1*3XCHAR
+originSubdivisionParameter 	= originSubdivisionCode "=" originSubdivisionValue
+
+nhrnPZNCode 			= "710"
+nhrnPZNValue 			= 1*20XCHAR
+nhrnPZNParameter 		= nhrnPZNCode "=" nhrnPZNValue
+
+nhrnCIPCode 			= "711"
+nhrnCIPValue 			= 1*20XCHAR
+nhrnCIPParameter 		= nhrnCIPCode "=" nhrnCIPValue
+
+nhrnCNCode 			= "712"
+nhrnCNValue 			= 1*20XCHAR
+nhrnCNParameter 		= nhrnCNCode "=" nhrnCNValue
+
+nhrnDRNCode 			= "713"
+nhrnDRNValue 			= 1*20XCHAR
+nhrnDRNParameter 		= nhrnDRNCode "=" nhrnDRNValue
+
+nhrnAIMCode 			= "714"
+nhrnAIMValue 			= 1*20XCHAR
+nhrnAIMParameter 		= nhrnAIMCode "=" nhrnAIMValue
+
+nsnCode 			= "7001"
+nsnValue 			= 13DIGIT
+nsnParameter 			= nsnCode "=" nsnValue
+
+meatCutCode 			= "7002"
+meatCutValue 			= 1*30XCHAR
+meatCutParameter 		= meatCutCode "=" meatCutValue
+
+activePotencyCode 		= "7004"
+activePotencyValue 		= 1*4DIGIT
+activePotencyParameter 		= activePotencyCode "=" activePotencyValue
+
+catchAreaCode 			= "7005"
+catchAreaValue 			= 1*12XCHAR
+catchAreaParameter 		= catchAreaCode "=" catchAreaValue
+
+fishingGearTypeCode 		= "7009"
+fishingGearTypeValue 		= 1*10XCHAR
+fishingGearTypeParameter 	= fishingGearTypeCode "=" fishingGearTypeValue
+
+prodMethodCode 			= "7010"
+prodMethodValue 		= 1*2XCHAR
+prodMethodParameter 		= prodMethodCode "=" prodMethodValue
+
+refurbLotCode 			= "7020"
+refurbLotValue 			= 1*20XCHAR
+refurbLotParameter 		= refurbLotCode "=" refurbLotValue
+
+funcStatCode 			= "7021"
+funcStatValue 			= 1*20XCHAR
+funcStatParameter 		= funcStatCode "=" funcStatValue
+
+revStatCode 			= "7022"
+revStatValue 			= 1*20XCHAR
+revStatParameter 		= revStatCode "=" revStatValue
+
+giaiAssemblyCode 		= "7023"
+giaiAssemblyValue 		= 1*30XCHAR
+giaiAssemblyParameter 		= giaiAssemblyCode "=" giaiAssemblyValue
+
+dimensionsCode 			= "8001"
+dimensionsValue 		= 14DIGIT
+dimensionsParameter 		= dimensionsCode "=" dimensionsValue
+
+cmtNoCode 			= "8002"
+cmtNoValue 			= 1*20XCHAR
+cmtNoParameter 			= cmtNoCode "=" cmtNoValue
+
+ibanCode 			= "8007"
+ibanValue 			= 1*34XCHAR
+ibanParameter 			= ibanCode "=" ibanValue
+
+prodTimeCode 			= "8008"
+prodTimeValue 			= 8DIGIT 1*4DIGIT
+prodTimeParameter 		= prodTimeCode "=" prodTimeValue
+
+versionCode 			= "8012"
+versionValue 			= 4DIGIT  1*20XCHAR
+versionParameter 		= versionCode "=" versionValue
+
+refNoCode 			= "8020"
+refNoValue 			= 1*25XCHAR
+refNoParameter 			= refNoCode "=" refNoValue
+
+couponIDNACode 			= "8110"
+couponIDNAValue 		= 1*70XCHAR
+couponIDNAParameter 		= couponIDNACode "=" couponIDNAValue
+
+pointsCode 			= "8111"
+pointsValue 			= 4DIGIT
+pointsParameter 		= pointsCode "=" pointsValue
+
+paperlessCouponIDNACode 	= "8112"
+paperlessCouponIDNAValue 	= 1*70XCHAR
+paperlessCouponIDNAParameter	= paperlessCouponIDNACode "=" paperlessCouponIDNAValue
+
+internalCode 			= "91" / "92" / "93" / "94" / "95" / "96" / "97" / "98" / "99"
+internalValue 			= 1*90XCHAR
+internalParameter		= internalCode "=" internalValue
+
+LotParameter 			= lot-code "=" lot-value
+
+expiryDateCode 			= "17" / %s"exp"
+expiryDateValue 		= 6DIGIT
+expiryDateParameter 		= expiryDateCode "=" expiryDateValue
+
+expiryTimeCode 			= "7003" / %s"expdt"
+expiryTimeValue 		= 10DIGIT
+expiryTimeParameter 		= expiryTimeCode "=" expiryTimeValue
+
+extensionParameter		= *( pchar / "/" / "?" )
+				; any other query string parameter permitted by RFC 3986
+				; including additional arbitrary key=value pairs
+
+queryStringParam 	= netWeightVMTIParameter / lengthVMTIParameter /
+			widthVMTIParameter  / depthVMTIParameter / areaVMTIParameter /
+			netVolumeVMTIParameter / massPerUnitAreaVMTIParameter /
+			grossWeightParameter / logisticLengthParameter /
+			logisticWidthParameter / logisticDepthParameter /
+			logisticAreaParameter / logisticVolumeParameter /
+			processorParameter / LotParameter / expiryDateParameter /
+			expiryTimeParameter / contentParameter / prodDateParameter /
+			dueDateParameter / packDateParameter / bestBeforeDateParameter /
+			sellByDateParameter / firstFreezeDateParameter /
+			harvestDateParameter / pricePerUnitParameter / variantParameter /
+			varCountParameter / countParameter / internalParameter /
+			additionalIdParameter / custPartNoParameter /
+			mtoVariantParameter / pcnParameter / secondarySerialParameter /
+			refToSourceParameter / amountParameter / amountISOParameter /
+			priceParameter / priceISOParameter / percentOffParameter /
+			orderNumberParameter / routeParameter / shipToLocParameter /
+			billToParameter / purchaseFromParameter / shipForLocParameter /
+			locNoParameter / prodServLocParameter / shipToPostParameter /
+			shipToPostISOParameter / originParameter /
+			countryProcessParameter / countryFullProcessParameter /
+			countryInitialProcessParameter / countryDisassemblyParameter /
+			originSubdivisionParameter / nhrnPZNParameter / nhrnCIPParameter /
+			nhrnCNParameter / nhrnDRNParameter / nsnParameter /
+			meatCutParameter / activePotencyParameter / catchAreaParameter /
+			fishingGearTypeParameter / prodMethodParameter /
+			refurbLotParameter / funcStatParameter / revStatParameter /
+			giaiAssemblyParameter / dimensionsParameter / cmtNoParameter /
+			ibanParameter / prodTimeParameter / versionParameter /
+			refNoParameter / couponIDNAParameter / pointsParameter /
+			paperlessCouponIDNAParameter /
+			internalParameter / mutualParameter / extensionParameter
+
+scheme	 		= "https" / "http"
+
+unreserved  		= ALPHA / DIGIT / "-" / "." / "_" / "~"
+
+reserved    		= gen-delims / sub-delims
+
+pct-encoded 		= "%" HEXDIG HEXDIG
+
+gen-delims  		= ":" / "/" / "?" / "#" / "[" / "]" / "@"
+
+sub-delims  		= "!" / "$" / "&" / "'" / "(" / ")" / "*" /
+			   "+" / "," / ";" / "="
+
+pchar        		= unreserved / pct-encoded / sub-delims / ":" / "@"
+
+segment       		= *pchar
+
+reg-name      		= *( unreserved / pct-encoded / sub-delims )
+
+
+dec-octet		= DIGIT                 ; 0-9
+		  	/ %x31-39 DIGIT         ; 10-99
+		  	/ "1" 2DIGIT            ; 100-199
+		  	/ "2" %x30-34 DIGIT     ; 200-249
+		  	/ "25" %x30-35          ; 250-255
+
+IPv4address 		= dec-octet "." dec-octet "." dec-octet "." dec-octet
+
+IPv6address 		= 6( h16 ":" ) ls32
+			  /                       "::" 5( h16 ":" ) ls32
+			  / [               h16 ] "::" 4( h16 ":" ) ls32
+			  / [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+			  / [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+			  / [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+			  / [ *4( h16 ":" ) h16 ] "::"              ls32
+			  / [ *5( h16 ":" ) h16 ] "::"              h16
+			  / [ *6( h16 ":" ) h16 ] "::"
+
+ls32        		= ( h16 ":" h16 ) / IPv4address
+			  ; least-significant 32 bits of address
+
+h16         		= 1*4HEXDIG
+			  ; 16 bits of address represented in hexadecimal
+
+IP-literal 		= "[" ( IPv6address / IPvFuture  ) "]"
+
+IPvFuture  		= "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+
+host        		= IP-literal / IPv4address / reg-name
+
+port 			= *DIGIT
+
+hostname		= host [ ":" port ]
+
+queryStringDelim 	= "&" / ";"
+
+queryStringComp 	= "?" queryStringParam *( queryStringDelim queryStringParam)
+
+gs1uriPattern 		= gs1path [queryStringComp]
+
+referenceGS1webURI 	= "https://id.gs1.org" gs1uriPattern
+
+customGS1webURI		= scheme "://" hostname *( "/" segment ) gs1uriPattern

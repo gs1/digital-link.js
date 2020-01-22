@@ -270,6 +270,11 @@ statsSpan.innerHTML = Utils.generateStatsHtml(dl.toUrlString());
 resultsSpan.innerHTML = Utils.generateResultsHtml(dl.toUrlString());
 ```
 
+### ABNF Grammar
+
+The generation of this tool is based on the standard's ABNF grammar.
+The grammar files corresponding to each version of the standard can be found in
+the `grammar` folder.
 
 ## Unit Tests
 
