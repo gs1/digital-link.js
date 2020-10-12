@@ -70,7 +70,7 @@ describe('Exports', () => {
 
   it('should export Utils.Rules', () => {
     expect(Utils.Rules).to.be.an('object');
-    expect(Object.keys(Utils.Rules).length).to.equal(29);
+    expect(Object.keys(Utils.Rules).length).to.equal(30);
   });
 
   it('should export Utils.testRule', () => {
@@ -292,6 +292,36 @@ describe('DigitalLink', () => {
       expect(dl.getKeyQualifier(ai)).to.equal(value);
     });
 
+    it('should set the key identifiers in the right order', () => {
+      const values = {
+        'gtin':{
+          'ai':'01',
+          'value':'12345678'
+        },
+        'lot':{
+          'ai':'10',
+          'value':'211'
+        },
+        'ser':{
+          'ai':'21',
+          'value':'2121'
+        },
+        'cpv':{
+          'ai':'22',
+          'value':'122113'
+        },
+      };
+
+      dl.setDomain('https://gs1.evrythng.com');
+      dl.setIdentifier(values.gtin.ai, values.gtin.value);
+      dl.setKeyQualifier(values.lot.ai, values.lot.value);
+      dl.setKeyQualifier(values.cpv.ai, values.cpv.value);
+      dl.setKeyQualifier(values.ser.ai, values.ser.value);
+
+      expect(dl.isValid()).to.equal(true);
+
+    });
+
     it('should set an attribute', () => {
       const key = 'thngId';
       const value = 'U5mQKGDpnymBwQwRakyBqeYh';
@@ -332,8 +362,10 @@ describe('DigitalLink', () => {
   });
 
   describe('Validation', () => {
+
     it('should validate using the grammar', () => {
-      expect(createUsingSetters().isValid()).to.equal(true);
+      const dl = createUsingSetters();
+      expect(dl.isValid()).to.equal(true);
     });
 
     it('should transparently validate a valid compressed URI', () => {
@@ -354,8 +386,8 @@ describe('DigitalLink', () => {
           { rule: 'gtin-comp', match: '/01/9780345418913', remainder: '' },
           { rule: 'gtin-path', match: '/01/9780345418913', remainder: '' },
           { rule: 'gs1path', match: '/01/9780345418913', remainder: '' },
-          { rule: 'gs1uriPattern', match: '/01/9780345418913', remainder: '' },
-          { rule: 'customGS1webURI', match: 'https://gs1.evrythng.com/01/9780345418913', remainder: '' },
+          { rule: 'uncompressedGS1webURIPattern', match: '/01/9780345418913', remainder: '' },
+          { rule: 'uncompressedCustomGS1webURI', match: 'https://gs1.evrythng.com/01/9780345418913', remainder: '' },
         ],
         success: true,
       };
@@ -377,15 +409,15 @@ describe('DigitalLink', () => {
           { rule: 'gtin-comp', match: '/01/9780345418913', remainder: 'd' },
           { rule: 'gtin-path', match: '/01/9780345418913', remainder: 'd' },
           { rule: 'gs1path', match: '/01/9780345418913', remainder: 'd' },
-          { rule: 'gs1uriPattern', match: '/01/9780345418913', remainder: 'd' },
-          { rule: 'customGS1webURI', match: 'https://gs1.evrythng.com/01/9780345418913', remainder: 'd' },
+          { rule: 'uncompressedGS1webURIPattern', match: '/01/9780345418913', remainder: 'd' },
+          { rule: 'uncompressedCustomGS1webURI', match: 'https://gs1.evrythng.com/01/9780345418913', remainder: 'd' },
         ],
         success: false,
       };
-
       const dl = DigitalLink('https://gs1.evrythng.com/01/9780345418913d');
       expect(dl.getValidationTrace()).to.deep.equal(expected);
     });
+
   });
 });
 
@@ -472,9 +504,38 @@ describe('Utils', () => {
   });
 
   it('should generate some results HTML', () => {
-    const input = 'https://data.gs1.org/01/47474747474747d';
+    const input = 'https://id.gs1.org/01/47474747474747d';
     const sample = '<table class="apg-state">';
+    const res = Utils.generateResultsHtml(input);
+    expect(res).to.include(sample);
+  });
+});
 
-    expect(Utils.generateResultsHtml(input)).to.include(sample);
+describe('Grammar', () => {
+  it('should recognize https and not http', () => {
+    const dl = DigitalLink('https://gs1.evrythng.com/01/9780345418913');
+    expect(dl.getValidationTrace().trace[0].match).to.equal("https");
+  });
+
+  //I created this test to check if a single parameter can be recognized
+  it('should recognize notBeforeDelDateParameter', () => {
+    const dl = DigitalLink('https://gs1.evrythng.com/01/9780345418913?4324=1234567891');
+    let containTheParameter = false;
+    dl.getValidationTrace().trace.forEach((e)=>{
+      if (e.rule === "notBeforeDelDateParameter")
+        containTheParameter = true;
+    });
+    expect(containTheParameter).to.equal(true);
+  });
+
+  //I created this test to check if a boolean paramter can be recognized
+  it('should recognize dangerousGoodsParameter', () => {
+    const dl = DigitalLink('https://gs1.evrythng.com/01/9780345418913?4321=1');
+    let containTheParameter = false;
+    dl.getValidationTrace().trace.forEach((e)=>{
+      if (e.rule === "dangerousGoodsParameter")
+        containTheParameter = true;
+    });
+    expect(containTheParameter).to.equal(true);
   });
 });

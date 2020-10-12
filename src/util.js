@@ -1,3 +1,5 @@
+'use strict';
+
 const apglib = require('apg-lib');
 const { grammarObject: GrammarObject } = require('../lib/grammarObject');
 
@@ -10,9 +12,10 @@ const GRAMMAR = new GrammarObject();
  * @param {object} attributes - Object of attributes, either GS1 or custom.
  * @returns {string} Reduced string containing the new attribute pairs.
  */
-const addQueryParams = (result, attributes) => Object.keys(attributes).reduce((res, key) => {
-  return res.concat(`${(res.endsWith('?') ? '' : '&')}${key}=${attributes[key]}`);
-}, result);
+const addQueryParams = (result, attributes) =>
+  Object.keys(attributes).reduce((res, key) => {
+    return res.concat(`${res.endsWith('?') ? '' : '&'}${key}=${attributes[key]}`);
+  }, result);
 
 /**
  * Get the top-level parser rule for the input string.
@@ -20,7 +23,8 @@ const addQueryParams = (result, attributes) => Object.keys(attributes).reduce((r
  * @param {string} str - The input string.
  * @returns {string} Either canonicalGS1webURI or customGS1webURI depending on format.
  */
-const getStartRule = str => str.includes('id.gs1.org') ? 'canonicalGS1webURI' : 'customGS1webURI';
+const getStartRule = str =>
+  str.includes('id.gs1.org') ? 'referenceGS1webURI' : 'uncompressedCustomGS1webURI';
 
 /**
  * Create an initialise a parser object, used for multiple applications.
@@ -28,9 +32,11 @@ const getStartRule = str => str.includes('id.gs1.org') ? 'canonicalGS1webURI' : 
  * @returns {object} Parser object.
  */
 const createParser = () => {
+  /* eslint-disable new-cap */
   const parser = new apglib.parser();
   parser.stats = new apglib.stats();
   parser.trace = new apglib.trace();
+  /* eslint-enable new-cap */
   return parser;
 };
 
@@ -44,6 +50,18 @@ const createParser = () => {
 const validateRule = (rule, inputStr) => {
   const result = createParser().parse(GRAMMAR, rule, apglib.utils.stringToChars(inputStr), []);
   return result.success;
+};
+
+/**
+ * The function search in the Grammar file for the rule and return it.
+ *
+ * @param {string} rule - The name of the rule (if the line in the grammar file doesn't start with this String, the function won't find the rule)
+ * @returns {string} The rule if it is in the grammar file, otherwise undefined
+ */
+const getRule = rule => {
+  const file = GRAMMAR.toString();
+  const lines = file.split('\n');
+  return lines.find(line => line.startsWith(rule));
 };
 
 /**
@@ -74,9 +92,11 @@ const assertStringPair = (key, value) => {
  * @param {string} type - The type to check key against.
  */
 const assertPropertyType = (dl, key, type) => {
+  /* eslint-disable valid-typeof */
   if (!dl[key] || typeof dl[key] !== type) {
     throw new Error(`${key} must be ${type}`);
   }
+  /* eslint-enable valid-typeof */
 };
 
 /**
@@ -112,17 +132,25 @@ const between = (str, start, end) => {
  * @param {string} inputStr - The input string.
  * @returns {object[]} Array of objects describing the validation trace.
  */
-const getTrace = (inputStr) => {
+const getTrace = inputStr => {
   const parser = createParser();
 
-  const result = parser.parse(GRAMMAR, getStartRule(inputStr), apglib.utils.stringToChars(inputStr), []);
-  const traceHtml = parser.trace.toHtmlPage('ascii', 'Parsing details:')
+  const result = parser.parse(
+    GRAMMAR,
+    getStartRule(inputStr),
+    apglib.utils.stringToChars(inputStr),
+    [],
+  );
+  const traceHtml = parser.trace
+    .toHtmlPage('ascii', 'Parsing details:')
     .replace('display mode: ASCII', '');
-  const rows = traceHtml.substring(traceHtml.indexOf('<table '), traceHtml.indexOf('</table>'))
+  const rows = traceHtml
+    .substring(traceHtml.indexOf('<table '), traceHtml.indexOf('</table>'))
     .split('<tr>')
     .filter(item => item.includes('&uarr;M'));
-  const trace = rows.filter(row => row.includes('apg-match'))
-    .map((row) => {
+  const trace = rows
+    .filter(row => row.includes('apg-match'))
+    .map(row => {
       const rule = row.match(/\((.*?)(?=\))/)[1];
       const sample = row.substring(row.indexOf(')'));
       const match = between(sample, 'match">', '<');
@@ -139,14 +167,16 @@ const getTrace = (inputStr) => {
  * @param {string} inputStr - The input URL to generate parser stats for.
  * @returns {string} HTML string representing the stats of the validation.
  */
-const generateStatsHtml = (inputStr) => {
+const generateStatsHtml = inputStr => {
   const parser = createParser();
   parser.parse(GRAMMAR, getStartRule(inputStr), apglib.utils.stringToChars(inputStr), []);
 
-  return parser.stats.toHtml('ops', 'ops-only stats')
-   + parser.stats.toHtml('index', 'rules ordered by index')
-   + parser.stats.toHtml('alpha', 'rules ordered alphabetically')
-   + parser.stats.toHtml('hits', 'rules ordered by hit count');
+  return (
+    parser.stats.toHtml('ops', 'ops-only stats') +
+    parser.stats.toHtml('index', 'rules ordered by index') +
+    parser.stats.toHtml('alpha', 'rules ordered alphabetically') +
+    parser.stats.toHtml('hits', 'rules ordered by hit count')
+  );
 };
 
 /**
@@ -155,7 +185,7 @@ const generateStatsHtml = (inputStr) => {
  * @param {string} inputStr - The input URL to generate parser trace for.
  * @returns {string} HTML string representing the trace steps of the validation.
  */
-const generateTraceHtml = (inputStr) => {
+const generateTraceHtml = inputStr => {
   const parser = createParser();
   parser.parse(GRAMMAR, getStartRule(inputStr), apglib.utils.stringToChars(inputStr), []);
   return parser.trace.toHtmlPage('ascii', 'Parsing details:');
@@ -167,7 +197,7 @@ const generateTraceHtml = (inputStr) => {
  * @param {string} inputStr - The input URL to generate parser results for.
  * @returns {string} HTML string representing the results of the validation.
  */
-const generateResultsHtml = (inputStr) => {
+const generateResultsHtml = inputStr => {
   const parser = createParser();
   const startRule = getStartRule(inputStr);
   const result = parser.parse(GRAMMAR, startRule, apglib.utils.stringToChars(inputStr), []);
@@ -185,4 +215,5 @@ module.exports = {
   generateStatsHtml,
   generateTraceHtml,
   generateResultsHtml,
+  findTheRule: getRule,
 };

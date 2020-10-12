@@ -1,6 +1,17 @@
+'use strict';
+
 const {
-  addQueryParams, assertPropertyType, assertStringPair, assignStringPair, validateUrl, validateRule,
-  getTrace, generateStatsHtml, generateTraceHtml, generateResultsHtml,
+  addQueryParams,
+  assertPropertyType,
+  assertStringPair,
+  assignStringPair,
+  validateUrl,
+  validateRule,
+  getTrace,
+  generateStatsHtml,
+  generateTraceHtml,
+  generateResultsHtml,
+  findTheRule,
 } = require('./util');
 const { compressWebUri, decompressWebUri, isCompressedWebUri } = require('./compression');
 
@@ -37,6 +48,7 @@ const Rules = {
   srin: 'srin-value',
   customGS1webURI: 'customGS1webURI',
   canonicalGS1webURI: 'canonicalGS1webURI',
+  gtinPath: 'gtin-path',
 };
 
 /**
@@ -65,19 +77,79 @@ const decode = (dl, str) => {
   dl.identifier[segments.shift()] = segments.shift();
 
   // /x/y until query
-  while(segments.length) {
+  while (segments.length) {
     dl.keyQualifiers[segments.shift()] = segments.shift();
   }
 
   // ?x=y...
   if (str.includes('?')) {
-    str.substring(str.indexOf('?') + 1)
+    str
+      .substring(str.indexOf('?') + 1)
       .split('&')
-      .forEach((pair) => {
+      .forEach(pair => {
         const [key, value] = pair.split('=');
         dl.attributes[key] = value;
       });
   }
+};
+
+/**
+ * Extract from the grammar rules the order of all the possible key qualifiers and return a map with a weight for each parameter
+ *
+ * @returns {Map} A map that contains all the possible key qualifiers and their weights. Example : { '10': 2, '21': 1, '22': 3, cpv: 3, lot: 2, ser: 1 }
+ */
+const getKeyQualifierWeights = () => {
+  const rule = findTheRule(Rules.gtinPath);
+
+  if (!rule) throw new Error(`The rule ${rule} wasn't found in the grammar file`);
+
+  // if my rule is : 'gtin-path  = gtin-comp  [cpv-comp] [lot-comp] [ser-comp]'
+  // In my parameterNames array, I'll have : [ 'cpv-comp', 'lot-comp', 'ser-comp' ]
+  const parameterNames = rule
+    .substring(rule.indexOf('=') + 1)
+    .split(' ')
+    .map(item => item.split(' ').join(''))
+    .filter(item => item.startsWith('['))
+    .map(item => item.replace('[', '').replace(']', ''));
+
+  // I retrieve the code rules of each parameter
+  // [ 'cpv-code  = "22" / %s"cpv"   ; Consumer Product Variant',
+  //   'lot-code  = "10" / %s"lot"   ; Batch/Lot identifier',
+  //   'ser-code  = "21" / %s"ser"   ; GTIN Serial Number' ]
+  const parametersCodeRules = parameterNames.map(param =>
+    findTheRule(param.replace('comp', 'code')),
+  );
+
+  // I retrieve the code value of each parameter : [ '22', '10', '21' ]
+  const parametersCodesValues = parametersCodeRules.map(singleRule => singleRule.match(/(\d+)/)[0]);
+
+  const keyQualifiersCodeWeight = parametersCodesValues.map((elem, index) => {
+    return {
+      [elem.toString()]: parameterNames.length - index,
+    };
+  });
+
+  const keyQualifiersNameWeight = parameterNames.map((elem, index) => {
+    return {
+      [elem.toString().replace('-comp', '')]: parameterNames.length - index,
+    };
+  });
+
+  const keyQualifiersWeight = new Map();
+
+  // I add the two maps to the keyQualifiersWeight Map
+  keyQualifiersNameWeight.forEach(elem => {
+    Object.entries(elem).forEach(([name, value]) => {
+      keyQualifiersWeight[name] = value;
+    });
+  });
+  keyQualifiersCodeWeight.forEach(elem => {
+    Object.entries(elem).forEach(([name, value]) => {
+      keyQualifiersWeight[name] = value;
+    });
+  });
+
+  return keyQualifiersWeight;
 };
 
 /**
@@ -86,7 +158,7 @@ const decode = (dl, str) => {
  * @param {object} dl - The DigitalLink (this).
  * @returns {string} The Digital Link in string form.
  */
-const encode = (dl) => {
+const encode = dl => {
   let result = dl.domain;
 
   // Identifier
@@ -95,9 +167,16 @@ const encode = (dl) => {
 
   // Key qualifiers
   if (dl.keyQualifiers) {
-    Object.keys(dl.keyQualifiers).forEach((key) => {
-      result += `/${key}/${dl.keyQualifiers[key]}`;
-    });
+    const keyQualifiersWeight = getKeyQualifierWeights();
+
+    // The key qualifiers have to be added in a special order so I need to sort them and then add them to the string
+    Object.keys(dl.keyQualifiers)
+      .sort((a, b) => {
+        return keyQualifiersWeight[b] - keyQualifiersWeight[a];
+      })
+      .forEach(key => {
+        result += `/${key}/${dl.keyQualifiers[key]}`;
+      });
   }
 
   // Data Attributes
@@ -115,7 +194,7 @@ const encode = (dl) => {
  * @param {(object|string)} [input] - Optional input construction object or string.
  * @returns {object} The DigitalLink instance with populated data.
  */
-const DigitalLink = (input) => {
+const DigitalLink = input => {
   // Model should only be manipulated through getters and setters to ensure types are correct
   const model = Symbol('model');
   const result = {
@@ -150,7 +229,7 @@ const DigitalLink = (input) => {
     decode(result[model], isCompressedWebUri(input) ? decompressWebUri(input) : input);
   }
 
-  result.setDomain = (domain) => {
+  result.setDomain = domain => {
     if (typeof domain !== 'string') {
       throw new Error('domain must be a string');
     }

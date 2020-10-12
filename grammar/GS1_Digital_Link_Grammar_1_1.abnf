@@ -590,7 +590,7 @@ queryStringParam 	= netWeightVMTIParameter / lengthVMTIParameter /
   	paperlessCouponIDNAParameter /
   	internalParameter / mutualParameter / extensionParameter
 
-scheme	= "http" / "https"
+scheme	= "https" / "http"
 
 unreserved	= ALPHA / DIGIT / "-" / "." / "_" / "~"
 

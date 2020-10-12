@@ -1,3 +1,5 @@
+'use strict';
+
 const GS1DigitalLinkToolkit = require('../lib/GS1DigitalLinkCompressionPrototype/GS1DigitalLinkToolkit');
 
 const toolkit = new GS1DigitalLinkToolkit();
@@ -8,7 +10,11 @@ const toolkit = new GS1DigitalLinkToolkit();
  * @param {string} uri - The URI.
  * @returns {string} The URI stem.
  */
-const getUriStem = uri => uri.split('/').slice(0, 3).join('/');
+const getUriStem = uri =>
+  uri
+    .split('/')
+    .slice(0, 3)
+    .join('/');
 
 /**
  * Use GS1DigitalLinkToolkit to compress a URI string.
@@ -19,21 +25,17 @@ const getUriStem = uri => uri.split('/').slice(0, 3).join('/');
  *                                                 key-value pairs.
  * @returns {string} The equivalent compressed URI.
  */
-const compressWebUri = (
-  uri,
-  useOptimisations = true,
-  compressOtherKeyValuePairs = true
-) => {
+const compressWebUri = (uri, useOptimisations = true, compressOtherKeyValuePairs = true) => {
   const uncompressedPrimary = false;
   const useShortText = false;
 
   return toolkit.compressGS1DigitalLink(
     uri,
-    useShortText,  // Not used
+    useShortText, // Not used
     getUriStem(uri),
-    uncompressedPrimary,  // Not used
+    uncompressedPrimary, // Not used
     useOptimisations,
-    compressOtherKeyValuePairs
+    compressOtherKeyValuePairs,
   );
 };
 
@@ -60,7 +62,7 @@ const decompressWebUri = (uri, useShortText = false) =>
  * @param {string} uri - The URI.
  * @returns {boolean} true if the URI is valid and looks compressed, false otherwise.
  */
-const isCompressedWebUri = (uri) => {
+const isCompressedWebUri = uri => {
   const data = toolkit.analyseURI(uri);
   const looksCompressed = ['fully', 'partially'].some(p => data.detected.includes(p));
   if (!looksCompressed) {
