@@ -8,8 +8,12 @@
 #   VERSION - The new SDK version being published.
 #   AWS_ACCESS_KEY_ID - AWS Access Key ID with permission to put to the bucket.
 #   AWS_SECRET_ACCESS_KEY - AWS Secret Key ID corresponding to the AWS_ACCESS_KEY_ID.
+#   NPM_TOKEN - NPM token for evt-master to pull private npm dependencies.
 
-docker build -t digital-link-js-deploy .
+docker build \
+  --build-arg NPM_TOKEN=$NPM_TOKEN \
+  -t digital-link-js-deploy \
+  .
 
 docker run \
   -e "BUCKET=$BUCKET" \
