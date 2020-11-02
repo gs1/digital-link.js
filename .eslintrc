@@ -1,0 +1,7 @@
+{
+  "extends": "@evrythng/eslint-config-evrythng",
+  "env": {
+    "browser": true,
+    "node": true
+  }
+}

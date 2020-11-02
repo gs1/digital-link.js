@@ -1,0 +1,124 @@
+[
+  {
+    "code": "00",
+    "ruleName": "sscc-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "01",
+    "ruleName": "gtin-value",
+    "keyQualifiers": [
+      "22",
+      "10",
+      "21"
+    ],
+    "keyQualifiersName": [
+      "cpv",
+      "lot",
+      "ser"
+    ]
+  },
+  {
+    "code": "253",
+    "ruleName": "gdti-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "255",
+    "ruleName": "gcn-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "401",
+    "ruleName": "ginc-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "402",
+    "ruleName": "gsin-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "414",
+    "ruleName": "gln-value",
+    "keyQualifiers": [
+      "254"
+    ],
+    "keyQualifiersName": [
+      "glnx"
+    ]
+  },
+  {
+    "code": "417",
+    "ruleName": "partyGln-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "8003",
+    "ruleName": "grai-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "8004",
+    "ruleName": "giai-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "8006",
+    "ruleName": "itip-value",
+    "keyQualifiers": [
+      "22",
+      "10",
+      "21"
+    ],
+    "keyQualifiersName": [
+      "cpv",
+      "lot",
+      "ser"
+    ]
+  },
+  {
+    "code": "8010",
+    "ruleName": "cpid-value",
+    "keyQualifiers": [
+      "8011"
+    ],
+    "keyQualifiersName": [
+      "cpsn"
+    ]
+  },
+  {
+    "code": "8013",
+    "ruleName": "gmn-value",
+    "keyQualifiers": [],
+    "keyQualifiersName": []
+  },
+  {
+    "code": "8017",
+    "ruleName": "gsrnp-value",
+    "keyQualifiers": [
+      "8019"
+    ],
+    "keyQualifiersName": [
+      "srin"
+    ]
+  },
+  {
+    "code": "8018",
+    "ruleName": "gsrn-value",
+    "keyQualifiers": [
+      "8019"
+    ],
+    "keyQualifiersName": [
+      "srin"
+    ]
+  }
+]

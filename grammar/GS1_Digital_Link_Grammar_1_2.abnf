@@ -1,6 +1,8 @@
 ;; GS1 Digital Link Web URI Grammar
 ;; Corresponding to version 1.2 of the GS1 Digital Link standard
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Character sets  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 DIGIT	= "0" / "1" / "2" / "3" / "4" /
 		  "5" / "6" / "7" / "8" / "9"
 
@@ -49,6 +51,8 @@ XCHAR 		= DIGIT / UPPERALPHA / LOWERALPHA / XSYMBOL
 
 YCHAR 		= DIGIT / UPPERALPHA / YSYMBOL
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;   SECTION - Primary identification keys  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 gtin-code	= "01"	/ %s"gtin"		; GTIN
 itip-code	= "8006" / %s"itip"		; ITIP
 gmn-code	= "8013" / %s"gmn"		; Global Model Number
@@ -65,6 +69,8 @@ gsin-code 	= "402"	/ %s"gsin"		; GSIN
 grai-code 	= "8003" / %s"grai"		; GRAI
 giai-code 	= "8004" / %s"giai"		; GIAI
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Key qualifiers  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 cpv-code 	= "22"	/ %s"cpv"   ; Consumer Product Variant
 lot-code 	= "10"	/ %s"lot"   ; Batch/Lot identifier
 ser-code 	= "21"	/ %s"ser"   ; GTIN Serial Number
@@ -74,6 +80,8 @@ refno-code	= "8020"	/ %s"refno" ; Payment Reference Number
 srin-code 	= "8019"	/ %s"srin"  ; Service Relation Instance Number
 tpx-code	= "235"	; third-party controlled serialised extension to GTIN
 uic-ext-code	= "7040"	; GS1 UIC with Extension 1 and Importer Index
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Primary key formats  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 gtin-value		= 14DIGIT / 13DIGIT / 12DIGIT / 8DIGIT
 itip-value	= 14DIGIT 2DIGIT 2DIGIT ; 14 digits then 2 digits then 2 digits
@@ -92,6 +100,8 @@ gsin-value 	= 17DIGIT   ; exactly 17 digits
 grai-value 	= 14DIGIT 1*16XCHAR; 14 digits then 1-16 characters ; from the 82-character subset of ISO/IEC 646
 giai-value 	= 1*30XCHAR  ; 1-30 characters from 82-chr subset
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Key qualifier formats  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 cpv-value	= 1*20XCHAR  ; 1-20 characters from 82-chr subset
 lot-value	= 1*20XCHAR  ; 1-20 characters from 82-chr subset
 ser-value	= 1*20XCHAR  ; 1-20 characters from 82-chr subset
@@ -101,6 +111,8 @@ refno-value 	= 1*25XCHAR  ; 1-25 characters from 82-chr subset
 srin-value 	= 1*10DIGIT  ; 1-10 digits
 tpx-value	= 1*28XCHAR  ; 1-28 characters from 82-chr subset
 uic-ext-value	= 1DIGIT 3XCHAR ; 1 digit then 3 characters from 82-chr subset
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Primary identifier and value concatenation  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 gtin-comp	= "/" gtin-code "/" gtin-value
 itip-comp 	= "/" itip-code "/" itip-value
@@ -117,6 +129,9 @@ ginc-comp 	= "/" ginc-code "/" ginc-value
 gsin-comp 	= "/" gsin-code "/" gsin-value
 grai-comp 	= "/" grai-code "/" grai-value
 giai-comp 	= "/" giai-code "/" giai-value
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Key qualifier concatenation  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 cpv-comp 	= "/" cpv-code "/" cpv-value
 lot-comp 	= "/" lot-code "/" lot-value
 ser-comp 	= "/" ser-code "/" ser-value
@@ -126,6 +141,8 @@ refno-comp	= "/" refno-code "/" refno-value
 srin-comp 	= "/" srin-code "/" srin-value
 tpx-comp	= "/" tpx-code "/" tpx-value
 uic-ext-comp	= "/" uic-ext-code "/" uic-ext-value
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Path element order  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 gtin-path 	= gtin-comp  [cpv-comp] [lot-comp] [ser-comp]
 itip-path 	= itip-comp  [cpv-comp] [lot-comp] [ser-comp]
@@ -150,6 +167,8 @@ gs1path 	= gtin-path / itip-path / gmn-path / cpid-path / partyGln-path / gsrnp-
   gsrn-path / gcn-path / sscc-path / gdti-path / ginc-path /
   gsin-path / grai-path / giai-path / upui-path / eoid-path /
   fid-path / mid-path
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Data attributes  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 netWeightVMTICode 	= "3100" / "3101" / "3102" / "3103" / "3104" / "3105" /
 		  "3200" / "3201" / "3202" / "3203" / "3204" / "3205" /
@@ -487,10 +506,17 @@ expiryTimeCode 	= "7003" / %s"expdt"
 expiryTimeValue 	= 10DIGIT
 expiryTimeParameter 	= expiryTimeCode "=" expiryTimeValue
 
-extensionParameter	= *( pchar / "/" / "?" )
+;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Extension mechanism and reserved keywords  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+sub-delims-without-equals	= "!" / "$" / "&" / "'" / "(" / ")" / "*" /
+      "+" / "," / ";"
+everythingExceptDigitsAndEquals = ALPHA / "-" / "." / "_" / "~" / pct-encoded / sub-delims-without-equals / ":" / "@" / "/" / "?"
+extensionParameter	= *( DIGIT ) everythingExceptDigitsAndEquals *( DIGIT / everythingExceptDigitsAndEquals / "=")
 	; any other query string parameter permitted by RFC 3986
 	; including additional arbitrary key=value pairs except as
 	; restricted in the above paragraph
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Constructing the query string  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 queryStringParam 	= netWeightVMTIParameter / lengthVMTIParameter /
 		widthVMTIParameter  / depthVMTIParameter / areaVMTIParameter /
@@ -543,6 +569,8 @@ queryStringParam 	= netWeightVMTIParameter / lengthVMTIParameter /
 		gsrnParameter / gcnParameter / ssccParameter / gdtiParameter /
 		gincParameter / gsinParameter / graiParameter /
 		giaiParameter / extensionParameter
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Constructing the GS1 Digital Link URI  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 scheme	= "https" / "http"
 
