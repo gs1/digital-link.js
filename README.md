@@ -36,7 +36,7 @@ const { DigitalLink, Utils } = require('digital-link.js');
 Add a `<script>` tag to your HTML page:
 
 ```html
-<script src="https://d10ka0m22z5ju5.cloudfront.net/js/digital-link.js/1.1.0/digital-link.js-1.1.0.js"></script>
+<script src="https://d10ka0m22z5ju5.cloudfront.net/js/digital-link.js/1.2.2/digital-link.js-1.2.2.js"></script>
 ```
 
 Then access the `digitalLinkJs` global variable:
@@ -64,6 +64,15 @@ The object can contain the following items:
   as key-value pairs.
 - `attributes` (object) - As for `keyQualifiers`, but containing GS1 Data
   Attributes and custom data attributes.
+- `sortKeyQualifiers` (boolean) - false by default. If you set it to true, the 
+key qualifiers will be sorted in the Web Uri String to match the order defined 
+by the GS1 Digital Link Grammar.
+- `keyQualifiersOrder` (Array) - It's an array that contains all the keys of the 
+key qualifiers. If the length of the array is not equal to the length of the
+`keyQualifiers` field, this array will be ignored. In this case, the order of the
+key qualifier in the Web Uri String will be the order of the map.
+Otherwise (if the length of the two fields are equal), the order of the key 
+qualifier in the Web Uri String will be the order define in this field.
 
 An example is shown below:
 
@@ -73,17 +82,25 @@ const { DigitalLink } = require('digital-link.js');
 const dl = DigitalLink({
   domain: 'https://dlnkd.tn.gg',
   identifier: {
-    '01': '9780345418913',
+    '01': '00860080001300',
   },
   keyQualifiers: {
     '21': '43786',
+    '10': '12345'
   },
+  keyQualifiersOrder: [
+    '10','21'
+  ],
   attributes: {
     thngId: 'UMwxDXBdUbxgtyRaR2HBrc4r',
   },
 });
 ```
+Alternatively, you can add the line below to replace the `keyQualifiersOrder`. This will sort them automatically.
 
+```js
+sortKeyQualifiers: true
+```
 
 ### Create with setters
 
@@ -95,8 +112,10 @@ const { DigitalLink } = require('digital-link.js');
 
 const dl = DigitalLink();
 dl.setDomain('https://dlnkd.tn.gg');
-dl.setIdentifier('01', '9780345418913');
+dl.setIdentifier('01', '00860080001300');
 dl.setKeyQualifier('21', '43786');
+dl.setKeyQualifier('10', '12345');
+dl.setKeyQualifiersOrder(['10', '21']);
 dl.setAttribute('thngId', 'UMwxDXBdUbxgtyRaR2HBrc4r');
 ```
 
@@ -107,8 +126,10 @@ const { DigitalLink } = require('digital-link.js');
 
 const dl = DigitalLink()
   .setDomain('https://dlnkd.tn.gg')
-  .setIdentifier('01', '9780345418913')
+  .setIdentifier('01', '00860080001300')
   .setKeyQualifier('21', '43786')
+  .setKeyQualifier('10', '12345')
+  .setKeyQualifiersOrder(['10', '21'])
   .setAttribute('thngId', 'UMwxDXBdUbxgtyRaR2HBrc4r');
 ```
 
@@ -118,7 +139,7 @@ const dl = DigitalLink()
 A `DigitalLink` object can also be created using an existing string:
 
 ```js
-const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
+const uri = 'https://dlnkd.tn.gg/01/00860080001300/10/12345/21/43786';
 
 const dl = DigitalLink(uri);
 ```
@@ -189,7 +210,9 @@ The example above contains an erroneous 'x' at the end, so it does not validate:
   "success": false
 }
 ```
-
+> Warning : if your domain contains a custom path (for example : `https://example.com/custom/path/01/00860080001300`), 
+> It will be removed (`https://example.com/01/00860080001300`) in the validation trace. That's because the
+> Digital Link Grammar file doesn't support the custom paths.
 
 ### Compression
 
@@ -202,7 +225,7 @@ very limited.
 To create a compressed URI, use the `toCompressedWebUriString()` method:
 
 ```js
-const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
+const uri = 'https://dlnkd.tn.gg/01/00860080001300/21/43786';
 const dl = DigitalLink(uri);
 
 const compressedUri = dl.toCompressedWebUriString();
@@ -225,7 +248,7 @@ decompression of URI strings:
 ```js
 const { Utils } = require('digital-link.js');
 
-const uri = 'https://dlnkd.tn.gg/01/9780345418913/21/43786';
+const uri = 'https://dlnkd.tn.gg/01/00860080001300/21/43786';
 
 // Compress a URI
 const compressedUri = Utils.compressWebUri(uri);
@@ -262,7 +285,6 @@ The trace steps (which matched a parser rule) are also shown, allowing you to
 see which parts of your input did not match any rule. The output of
 `toJsonString()` is also shown as an insight into the make-up of the URL itself.
 
-
 ## Utilities
 
 Since this library is based on
@@ -277,7 +299,7 @@ For example, validating a GTIN by itself:
 const { Utils } = require('digital-link.js');
 
 // Validate a GTIN
-const gtin = '438948397';
+const gtin = '00860080001300';
 const rule = Utils.Rules.gtin;
 
 console.log(`Is the GTIN ${gtin} valid? ${Util.testRule(rule, gtin)}`);
@@ -289,7 +311,7 @@ parser run against the input:
 ```js
 const { DigitalLink, Utils } = require('digital-link.js');
 
-const dl = DigitalLink('https://gs1.evrythng.com/01/9780345418913');
+const dl = DigitalLink('https://gs1.evrythng.com/01/00860080001300');
 
 // See all the parser trace steps for a given DigitalLink URL
 traceSpan.innerHTML = Utils.generateTraceHtml(dl.toUrlString());
@@ -300,6 +322,12 @@ statsSpan.innerHTML = Utils.generateStatsHtml(dl.toUrlString());
 // See all the parser results for a given DigitalLink URL
 resultsSpan.innerHTML = Utils.generateResultsHtml(dl.toUrlString());
 ```
+
+> Warning : if your domain contains a custom path (for example : `https://example.com/custom/path/01/00860080001300`), 
+> We recommand you to remove it (`https://example.com/01/00860080001300`) by calling `Utils.removeCustomPath()` for the 
+> `generateTraceHtml`, `generateStatsHtml` and `generateResultsHtml` functions. Since the Digital Link Grammar 
+> file doesn't support the custom path. Otherwise, all your fields (identifier, key qualifiers, ...) won't be
+> recognized.
 
 ### ABNF Grammar
 
@@ -322,7 +350,6 @@ particular:
 * [`GS1DigitalLinkCompressionPrototype`](https://github.com/gs1/GS1DigitalLinkCompressionPrototype) -
   which is a prototype implementation of the Digital Link compression as
   specified in the GS1 Digital Link 1.1 draft specification.
-
 
 ## Deployment
 

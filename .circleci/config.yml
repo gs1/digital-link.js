@@ -6,6 +6,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: 'Save npm token'
+          command: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc'
+      - run:
           name: 'Install dependencies'
           command: 'npm ci'
       - run:
