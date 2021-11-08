@@ -18,26 +18,26 @@ HEXDIG	= DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
 
 DoubleQuote = '"' ; the double-quote character "
 
-Octothorpe	= "%x23" ; percent-encoding of the # character
-ForwardSlash	= "%x2F" ; percent-encoding of the / character
+Octothorpe	= "%23" ; percent-encoding of the # character
+ForwardSlash	= "%2F" ; percent-encoding of the / character
 
-Percent	= "%x25" ; percent-encoding of the % character
-Ampersand	= "%x26" ; percent-encoding of the & character
-Plus	= "%x2B" ; percent-encoding of the + character
-Comma	= "%x2C" ; percent-encoding of the , character
+Percent	= "%25" ; percent-encoding of the % character
+Ampersand	= "%26" ; percent-encoding of the & character
+Plus	= "%2B" ; percent-encoding of the + character
+Comma	= "%2C" ; percent-encoding of the , character
 
-Exclamation	= "%x21" ; percent-encoding of the ! character
-LeftBracket	= "%x28" ; percent-encoding of the ( character
-RightBracket	= "%x29" ; percent-encoding of the ) character
-Asterisk	= "%x2A" ; percent-encoding of the * character
+Exclamation	= "%21" ; percent-encoding of the ! character
+LeftBracket	= "%28" ; percent-encoding of the ( character
+RightBracket	= "%29" ; percent-encoding of the ) character
+Asterisk	= "%2A" ; percent-encoding of the * character
 
-Apostrophe	= "%x27" ; percent-encoding of the ' character
-Colon	= "%x3A" ; percent-encoding of the : character
-Semicolon	= "%x3B" ; percent-encoding of the ; character
-LeftAngleBracket	= "%x3C" ; percent-encoding of the < character
-Equals	= "%x3D" ; percent-encoding of the = character
-RightAngleBracket	= "%x3E" ; percent-encoding of the > character
-QuestionMark	= "%x3F" ; percent-encoding of the ? character
+Apostrophe	= "%27" ; percent-encoding of the ' character
+Colon	= "%3A" ; percent-encoding of the : character
+Semicolon	= "%3B" ; percent-encoding of the ; character
+LeftAngleBracket	= "%3C" ; percent-encoding of the < character
+Equals	= "%3D" ; percent-encoding of the = character
+RightAngleBracket	= "%3E" ; percent-encoding of the > character
+QuestionMark	= "%3F" ; percent-encoding of the ? character
 
 XSYMBOL 		= DoubleQuote / "-" / "." / "_" / Exclamation / Percent /
 			  Ampersand / Plus / Comma / ForwardSlash / Asterisk /
@@ -163,7 +163,7 @@ upui-path	= gtin-comp tpx-comp
 eoid-path	= partyGln-comp uic-ext-comp
 fid-path	= gln-comp uic-ext-comp
 mid-path	= giai-comp uic-ext-comp
-gs1path 	= gtin-path / itip-path / gmn-path / cpid-path / partyGln-path / gsrnp-path /
+gs1path 	= gtin-path / itip-path / gmn-path / cpid-path / gln-path / partyGln-path / gsrnp-path /
   gsrn-path / gcn-path / sscc-path / gdti-path / ginc-path /
   gsin-path / grai-path / giai-path / upui-path / eoid-path /
   fid-path / mid-path
@@ -205,7 +205,6 @@ areaVMTICode 	= "3140" / "3141" / "3142" / "3143" / "3144" / "3145" /
 	  "3520" / "3521" / "3522" / "3523" / "3524" / "3525"
 
 areaVMTIValue = 6DIGIT
-
 areaVMTIParameter = areaVMTICode "=" areaVMTIValue
 
 netVolumeVMTICode 	= "3150" / "3151" / "3152" / "3153" / "3154" / "3155" /
@@ -420,7 +419,7 @@ shipToAdd2Parameter	= "4303=" 1*70XCHAR
 
 shipToSubParameter	= "4304=" 1*70XCHAR
 
-;shipToLocparameter = "4305=" 1*70XCHAR
+shipToLocalityParameter = "4305=" 1*70XCHAR
 
 shipToRegParameter	= "4306=" 1*70XCHAR
 
@@ -461,6 +460,12 @@ notBeforeDelDateParameter	= "4324=" 10DIGIT
 notAfterDelDateParameter	= "4325=" 10DIGIT
 
 releaseDateParameter	= "4326=" 6DIGIT
+
+amountPayPerUnitCode = "3950" / "3951" / "3952" / "3953"
+
+amountPayPerUnitValue = 6DIGIT
+
+amountPayPerUnitParameter = amountPayPerUnitCode "=" amountPayPerUnitValue
 
 gtinParameter	= "01=" gtin-value
 
@@ -508,10 +513,9 @@ expiryTimeParameter 	= expiryTimeCode "=" expiryTimeValue
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Extension mechanism and reserved keywords  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-sub-delims-without-equals	= "!" / "$" / "&" / "'" / "(" / ")" / "*" /
-      "+" / "," / ";"
-everythingExceptDigitsAndEquals = ALPHA / "-" / "." / "_" / "~" / pct-encoded / sub-delims-without-equals / ":" / "@" / "/" / "?"
-extensionParameter	= *( DIGIT ) everythingExceptDigitsAndEquals *( DIGIT / everythingExceptDigitsAndEquals / "=")
+extensionKey = *( DIGIT ) everythingExceptDigitsAndEquals *( DIGIT / everythingExceptDigitsAndEquals)
+extensionValue = *( DIGIT / everythingExceptDigitsAndEquals / "=")
+extensionParameter = extensionKey "=" extensionValue
 	; any other query string parameter permitted by RFC 3986
 	; including additional arbitrary key=value pairs except as
 	; restricted in the above paragraph
@@ -529,7 +533,7 @@ queryStringParam 	= netWeightVMTIParameter / lengthVMTIParameter /
 		dueDateParameter / packDateParameter / bestBeforeDateParameter /
 		sellByDateParameter / firstFreezeDateParameter /
 		harvestDateParameter / pricePerUnitParameter / variantParameter /
-		varCountParameter / countParameter / internalParameter /
+		varCountParameter / countParameter / amountPayPerUnitParameter /
 		additionalIdParameter / custPartNoParameter /
 		mtoVariantParameter / pcnParameter / secondarySerialParameter /
 		refToSourceParameter / amountParameter / amountISOParameter /
@@ -550,10 +554,10 @@ queryStringParam 	= netWeightVMTIParameter / lengthVMTIParameter /
 		refNoParameter / couponIDNAParameter / pointsParameter /
 		itipContentParameter / certificationRefParameter /
 		aquaticSpeciesParameter / opticalSensorParameter /
-		paperlessCouponIDNAParameter / mutualParameter /
+		paperlessCouponIDNAParameter / internalParameter / mutualParameter / extensionParameter /
 		shipToCompParameter / shipToNameParameter /
 		shipToAdd1Parameter / shipToAdd2Parameter /
-		shipToSubParameter / shipToLocParameter /
+		shipToSubParameter / shipToLocalityParameter /
 		shipToRegParameter / shipToCountryParameter /
 		shipToPhoneParameter / rtnToCompParameter /
 		rtnToNameParameter / rtnToAdd1Parameter /
@@ -568,7 +572,7 @@ queryStringParam 	= netWeightVMTIParameter / lengthVMTIParameter /
 		glnParameter / partyGlnParameter / gsrnpParameter /
 		gsrnParameter / gcnParameter / ssccParameter / gdtiParameter /
 		gincParameter / gsinParameter / graiParameter /
-		giaiParameter / extensionParameter
+		giaiParameter
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SECTION - Constructing the GS1 Digital Link URI  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -584,6 +588,12 @@ gen-delims	= ":" / "/" / "?" / "#" / "[" / "]" / "@"
 
 sub-delims	= "!" / "$" / "&" / "'" / "(" / ")" / "*" /
       "+" / "," / ";" / "="
+
+sub-delims-without-equals	= "!" / "$" / "&" / "'" / "(" / ")" / "*" /
+      "+" / "," / ";"
+everythingExceptDigitsAndEquals =  unreserved / pct-encoded /
+                                   sub-delims-without-equals /
+                                   ":" / "@" / "/" / "?"
 
 pchar	= unreserved / pct-encoded / sub-delims / ":" / "@"
 
