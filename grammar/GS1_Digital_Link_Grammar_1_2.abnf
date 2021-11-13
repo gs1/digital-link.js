@@ -284,7 +284,7 @@ countParameter	= "37=" 1*8DIGIT
 
 mutualParameter	= "90=" 1*30DIGIT
 
-additionalIdParameter	= "240=" 1*30DIGIT
+additionalIdParameter	= "240=" 1*30XCHAR
 
 custPartNoParameter	= "241=" 1*30DIGIT
 

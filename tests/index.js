@@ -555,6 +555,11 @@ describe('DigitalLink', () => {
         const dl = DigitalLink('https://example.com/01/12345678/10/4512?4321=2');
         expect(dl.isValid()).to.equal(false);
       });
+
+      it('should validate since additionalIdParameter is a xchar', () => {
+        const dl = DigitalLink('https://example.com/01/12345678/10/4512?240=ABCD');
+        expect(dl.isValid()).to.equal(true);
+      });
     });
   });
 });
