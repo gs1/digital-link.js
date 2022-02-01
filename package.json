@@ -28,6 +28,7 @@
     "webpack-cli": "^3.3.6"
   },
   "dependencies": {
+    "@ollah666/checkdigitcalculator": "^1.0.4",
     "apg-lib": "^3.2.0"
   },
   "repository": {

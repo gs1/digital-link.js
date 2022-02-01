@@ -1,7 +1,7 @@
 'use strict';
 
 const { expect } = require('chai');
-const { DigitalLink, Utils } = require('..');
+const { DigitalLink, Utils, CheckDigit } = require('..');
 
 const DATA = {
   domain: 'https://gs1.evrythng.com',
@@ -365,7 +365,7 @@ describe('DigitalLink', () => {
       const values = {
         gtin: {
           ai: '01',
-          value: '12345678',
+          value: '12345670',
         },
         lot: {
           ai: '10',
@@ -514,12 +514,12 @@ describe('DigitalLink', () => {
 
     describe('Some example test cases', () => {
       it('should allow a GTIN only', () => {
-        const dl = DigitalLink('https://example.com/01/01234567/');
+        const dl = DigitalLink('https://example.com/01/01234565/');
         expect(dl.isValid()).to.equal(true);
       });
 
       it('should allow a GTIN with two key qualifiers', () => {
-        const dl = DigitalLink('https://example.com/01/01234567/10/12345/21/4512');
+        const dl = DigitalLink('https://example.com/01/01234565/10/12345/21/4512');
         expect(dl.isValid()).to.equal(true);
       });
 
@@ -529,13 +529,13 @@ describe('DigitalLink', () => {
       });
 
       it('Should validate when key qualifiers are not in the right order, but were sorted (Numeric)', () => {
-        const dl = DigitalLink('https://example.com/01/01234567/21/12345/10/4512');
+        const dl = DigitalLink('https://example.com/01/01234565/21/12345/10/4512');
         dl.setSortKeyQualifiers(true);
         expect(dl.isValid()).to.equal(true);
       });
 
       it('Should validate when key qualifiers are not in the right order, but were sorted (Alphanumeric)', () => {
-        const dl = DigitalLink('https://example.com/01/01234567/21/12345/10/4512');
+        const dl = DigitalLink('https://example.com/01/01234565/21/12345/10/4512');
         dl.setSortKeyQualifiers(true);
         expect(dl.isValid()).to.equal(true);
       });
@@ -557,9 +557,85 @@ describe('DigitalLink', () => {
       });
 
       it('should validate since additionalIdParameter is a xchar', () => {
-        const dl = DigitalLink('https://example.com/01/12345678/10/4512?240=ABCD');
+        const dl = DigitalLink('https://example.com/01/12345670/10/4512?240=ABCD');
         expect(dl.isValid()).to.equal(true);
       });
+
+      it('should validate only valid check digits for gtin', () => {
+        let dl = DigitalLink('https://example.com/gtin/012345678905');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/01/012345678905');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/01/012345678906');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for grai', () => {
+        let dl = DigitalLink('https://example.com/grai/050606547800290002');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/8003/050606547800230002');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gln', () => {
+        let dl = DigitalLink('https://example.com/gln/0123456789128');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gln/0123456789123');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for sscc', () => {
+        let dl = DigitalLink('https://example.com/sscc/012345678912345675');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/sscc/012345678912345673');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gsrn', () => {
+        let dl = DigitalLink('https://example.com/gsrn/012345678912345675');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gsrn/012345678912345673');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gdti', () => {
+        let dl = DigitalLink('https://example.com/gdti/012345178912345667');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gdti/012341178912345667');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gsin', () => {
+        let dl = DigitalLink('https://example.com/gsin/01234367891244565');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gsin/01234567891244565');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gcn', () => {
+        let dl = DigitalLink('https://example.com/gcn/01234567891284569');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gcn/01234567891244569');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+
+      it("should validate even though the identifier hasn't any check digit", () => {
+        let dl = DigitalLink('https://example.com/giai/0801234126');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/giai/0801234127');
+        expect(dl.isValid()).to.equal(true);
+      });
+
+      it("isCheckDigitValid method", () => {
+        let dl = DigitalLink('https://example.com/gtin/012345678905');
+        expect(dl.isCheckDigitValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/01/012345678905');
+        expect(dl.isCheckDigitValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/01/012345678906');
+        expect(dl.isCheckDigitValid()).to.equal(false);
+      });
+
     });
   });
 });
@@ -682,6 +758,31 @@ describe('Utils', () => {
     const segments = ['some', '01', 'path', '01', '12345678', '21', '4545646'];
     expect(Utils.getIdentifierCodeIndex(segments)).to.equal(3);
   });
+
+});
+
+describe('Check digits', () => {
+
+  it('Should check if the key is a key code or not', () => {
+    expect(CheckDigit.isKeyCode('01')).to.equal(true);
+    expect(CheckDigit.isKeyCode('gtin')).to.equal(false);
+    expect(CheckDigit.isKeyCode('01a')).to.equal(false);
+    expect(CheckDigit.isKeyCode('0123456789')).to.equal(true);
+  });
+
+  it('Should check the check digit of GRAI field', () => {
+    expect(CheckDigit.checkTheCheckDigitCalculation(14,"050606547800290002")).to.equal(true);
+    expect(CheckDigit.checkTheCheckDigitCalculation(14,"050606547800230002")).to.equal(false);
+  });
+
+  it('Should check the check digit of GTIN field', () => {
+    // -1 means end of string
+    expect(CheckDigit.checkTheCheckDigitCalculation(-1,"012345678905")).to.equal(true);
+    expect(CheckDigit.checkTheCheckDigitCalculation(-1,"012345678906")).to.equal(false);
+    expect(CheckDigit.checkTheCheckDigitCalculation(-1,"00012345678905")).to.equal(true);
+    expect(CheckDigit.checkTheCheckDigitCalculation(-1,"00012345678908")).to.equal(false);
+  });
+
 });
 
 describe('Grammar', () => {
