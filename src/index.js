@@ -13,12 +13,12 @@ const {
   generateTraceHtml,
   generateResultsHtml,
   getIdentifierCodeIndex,
-  removeCustomPath
+  removeCustomPath,
 } = require('./util');
 const {
   checkTheCheckDigitCalculation,
   checkTheCheckDigitCalculationOfDigitalLink,
-  isKeyCode
+  isKeyCode,
 } = require('./checkDigit');
 const { compressWebUri, decompressWebUri, isCompressedWebUri } = require('./compression');
 
@@ -365,7 +365,10 @@ const DigitalLink = input => {
   result.toCompressedWebUriString = () => compressWebUri(result.toWebUriString());
   result.toJsonString = () => JSON.stringify(result[model]);
   result.isValid = () => {
-    return isValid(removeCustomPath(result.toWebUriString(), result.getDomain())) && checkTheCheckDigitCalculationOfDigitalLink(result[model]);
+    return (
+      isValid(removeCustomPath(result.toWebUriString(), result.getDomain())) &&
+      checkTheCheckDigitCalculationOfDigitalLink(result[model])
+    );
   };
   result.isCheckDigitValid = () => checkTheCheckDigitCalculationOfDigitalLink(result[model]);
   result.getValidationTrace = () =>
@@ -407,6 +410,6 @@ module.exports = {
   CheckDigit: {
     checkTheCheckDigitCalculation,
     checkTheCheckDigitCalculationOfDigitalLink,
-    isKeyCode
-  }
+    isKeyCode,
+  },
 };
