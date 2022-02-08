@@ -215,8 +215,8 @@ The example above contains an erroneous 'x' at the end, so it does not validate:
 > Digital Link Grammar file doesn't support the custom paths.
 
 > Warning : The isValid method also checks if the identifier has a valid check digit. If it isn't the case, it will 
-> return false. However, the getValidationTrace won't show anny error since it doesn't take into account the check digit
-> verification
+> return false. However, the getValidationTrace won't show any error since it doesn't take into account the check digit
+> verification.
 
 ### Compression
 

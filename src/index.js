@@ -15,11 +15,7 @@ const {
   getIdentifierCodeIndex,
   removeCustomPath,
 } = require('./util');
-const {
-  checkTheCheckDigitCalculation,
-  checkTheCheckDigitCalculationOfDigitalLink,
-  isKeyCode,
-} = require('./checkDigit');
+const { validateCheckDigit, validateIdentifierCheckDigit, isKeyCode } = require('./checkDigit');
 const { compressWebUri, decompressWebUri, isCompressedWebUri } = require('./compression');
 
 /**
@@ -367,10 +363,18 @@ const DigitalLink = input => {
   result.isValid = () => {
     return (
       isValid(removeCustomPath(result.toWebUriString(), result.getDomain())) &&
-      checkTheCheckDigitCalculationOfDigitalLink(result[model])
+      validateIdentifierCheckDigit(result[model])
     );
   };
-  result.isCheckDigitValid = () => checkTheCheckDigitCalculationOfDigitalLink(result[model]);
+  result.isCheckDigitValid = () => validateIdentifierCheckDigit(result[model]);
+
+  /**
+   * Allows you to see each step of the validation of the digital link.
+   * However, this method won't show any error if the identifier has a wrong check digit since the ABNF verification
+   * doesn't take it into account.
+   *
+   * @returns {object[]} - an object containing the trace of the validation.
+   */
   result.getValidationTrace = () =>
     getTrace(removeCustomPath(result.toWebUriString(), result.getDomain()));
 
@@ -408,8 +412,8 @@ module.exports = {
     removeCustomPath,
   },
   CheckDigit: {
-    checkTheCheckDigitCalculation,
-    checkTheCheckDigitCalculationOfDigitalLink,
+    validateCheckDigit,
+    validateIdentifierCheckDigit,
     isKeyCode,
   },
 };

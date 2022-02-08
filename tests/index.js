@@ -620,14 +620,14 @@ describe('DigitalLink', () => {
       });
 
 
-      it("should validate even though the identifier hasn't any check digit", () => {
+      it("should not validate since the identifier hasn't any check digit", () => {
         let dl = DigitalLink('https://example.com/giai/0801234126');
-        expect(dl.isValid()).to.equal(true);
+        expect(dl.isValid()).to.equal(false);
         dl = DigitalLink('https://example.com/giai/0801234127');
-        expect(dl.isValid()).to.equal(true);
+        expect(dl.isValid()).to.equal(false);
       });
 
-      it("isCheckDigitValid method", () => {
+      it("should use the isCheckDigitValid method correctly", () => {
         let dl = DigitalLink('https://example.com/gtin/012345678905');
         expect(dl.isCheckDigitValid()).to.equal(true);
         dl = DigitalLink('https://example.com/01/012345678905');
@@ -771,16 +771,16 @@ describe('Check digits', () => {
   });
 
   it('Should check the check digit of GRAI field', () => {
-    expect(CheckDigit.checkTheCheckDigitCalculation(14,"050606547800290002")).to.equal(true);
-    expect(CheckDigit.checkTheCheckDigitCalculation(14,"050606547800230002")).to.equal(false);
+    expect(CheckDigit.validateCheckDigit(14,"050606547800290002")).to.equal(true);
+    expect(CheckDigit.validateCheckDigit(14,"050606547800230002")).to.equal(false);
   });
 
   it('Should check the check digit of GTIN field', () => {
     // -1 means end of string
-    expect(CheckDigit.checkTheCheckDigitCalculation(-1,"012345678905")).to.equal(true);
-    expect(CheckDigit.checkTheCheckDigitCalculation(-1,"012345678906")).to.equal(false);
-    expect(CheckDigit.checkTheCheckDigitCalculation(-1,"00012345678905")).to.equal(true);
-    expect(CheckDigit.checkTheCheckDigitCalculation(-1,"00012345678908")).to.equal(false);
+    expect(CheckDigit.validateCheckDigit(-1,"012345678905")).to.equal(true);
+    expect(CheckDigit.validateCheckDigit(-1,"012345678906")).to.equal(false);
+    expect(CheckDigit.validateCheckDigit(-1,"00012345678905")).to.equal(true);
+    expect(CheckDigit.validateCheckDigit(-1,"00012345678908")).to.equal(false);
   });
 
 });
