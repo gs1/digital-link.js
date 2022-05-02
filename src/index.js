@@ -381,8 +381,23 @@ const DigitalLink = input => {
   result.getIdentifier = () => result[model].identifier;
   result.getKeyQualifier = key => result[model].keyQualifiers[key];
   result.getKeyQualifiers = () => result[model].keyQualifiers;
-  result.getAttribute = key => result[model].attributes[key];
-  result.getAttributes = () => result[model].attributes;
+  result.getAttribute = key => {
+    if (key === 'linkType') {
+      return result[model].linkType;
+    }
+    return result[model].attributes[key];
+  };
+  result.getAttributes = () => {
+    const obj = {
+      ...result[model].attributes,
+    };
+
+    if (result[model].linkType){
+      obj.linkType = result[model].linkType;
+    }
+
+    return obj
+  };
   result.getSortKeyQualifiers = () => result[model].sortKeyQualifiers;
   result.getKeyQualifiersOrder = () => result[model].keyQualifiersOrder;
   result.getLinkType = () => result[model].linkType;

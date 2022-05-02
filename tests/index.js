@@ -318,8 +318,27 @@ describe('DigitalLink', () => {
       expect(value).to.equal(DATA.customAttribute.value);
     });
 
-    it('should return all attributes', () => {
+    it('should return all attributes with linkType', () => {
       const value = createUsingSetters().getAttributes();
+      const expected = {
+        [DATA.bestBeforeAttribute.key]: DATA.bestBeforeAttribute.value,
+        [DATA.customAttribute.key]: DATA.customAttribute.value,
+        'linkType': 'test',
+      };
+
+      expect(value).to.deep.equal(expected);
+    });
+
+    it('should return all attributes without linkType', () => {
+      const value = DigitalLink()
+        .setDomain(DATA.domain)
+        .setIdentifier(DATA.identifier.key, DATA.identifier.value)
+        .setKeyQualifier(DATA.batchQualifier.key, DATA.batchQualifier.value)
+        .setKeyQualifier(DATA.serialQualifier.key, DATA.serialQualifier.value)
+        .setKeyQualifiersOrder(DATA.keyQualifiersOrder)
+        .setAttribute(DATA.bestBeforeAttribute.key, DATA.bestBeforeAttribute.value)
+        .setAttribute(DATA.customAttribute.key, DATA.customAttribute.value)
+        .getAttributes();
       const expected = {
         [DATA.bestBeforeAttribute.key]: DATA.bestBeforeAttribute.value,
         [DATA.customAttribute.key]: DATA.customAttribute.value,
@@ -327,6 +346,20 @@ describe('DigitalLink', () => {
 
       expect(value).to.deep.equal(expected);
     });
+
+
+
+    it('should return link type', () => {
+      const value = createUsingSetters().getLinkType();
+      const value2 = createUsingSetters().getAttribute('linkType');
+      const value3 = createUsingSetters().getAttributes().linkType;
+      const expected = DATA.linkType;
+
+      expect(value).to.deep.equal(expected);
+      expect(value2).to.deep.equal(expected);
+      expect(value3).to.deep.equal(expected);
+    });
+
   });
 
   describe('Setters', () => {
