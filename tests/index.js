@@ -1,7 +1,7 @@
 'use strict';
 
 const { expect } = require('chai');
-const { DigitalLink, Utils, CheckDigit } = require('..');
+const { DigitalLink, Utils, CheckDigit, webVoc } = require('..');
 
 const DATA = {
   domain: 'https://gs1.evrythng.com',
@@ -134,6 +134,11 @@ describe('Exports', () => {
 
   it('should export Utils.isCompressedWebUri', () => {
     expect(Utils.isCompressedWebUri).to.be.a('function');
+  });
+
+  it('should export the web vocabulary', () => {
+    expect(webVoc).to.be.a('object');
+    expect(webVoc.linkType.activityIdeas).to.equal('gs1:activityIdeas');
   });
 });
 

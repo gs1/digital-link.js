@@ -17,6 +17,7 @@ const {
 } = require('./util');
 const { validateCheckDigit, validateIdentifierCheckDigit, isKeyCode } = require('./checkDigit');
 const { compressWebUri, decompressWebUri, isCompressedWebUri } = require('./compression');
+const { webVoc } = require('./data/webVoc');
 
 /**
  * Individual parser rules that can be run with `testRule()`.
@@ -392,11 +393,11 @@ const DigitalLink = input => {
       ...result[model].attributes,
     };
 
-    if (result[model].linkType){
+    if (result[model].linkType) {
       obj.linkType = result[model].linkType;
     }
 
-    return obj
+    return obj;
   };
   result.getSortKeyQualifiers = () => result[model].sortKeyQualifiers;
   result.getKeyQualifiersOrder = () => result[model].keyQualifiersOrder;
@@ -444,6 +445,7 @@ const testRule = (rule, value) => {
 
 module.exports = {
   DigitalLink,
+  webVoc,
   Utils: {
     Rules,
     testRule,
