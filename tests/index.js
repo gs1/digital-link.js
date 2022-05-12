@@ -245,6 +245,7 @@ describe('DigitalLink', () => {
       expect(createUsingString().toWebUriString()).to.equal(expected);
       expect(createUsingSetters().toWebUriString()).to.equal(expected);
       expect(createUsingChain().toWebUriString()).to.equal(expected);
+      expect(DATA.url).to.equal(expected);
     });
 
     it('should not allow access to underlying data', () => {
