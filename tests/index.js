@@ -480,6 +480,12 @@ describe('DigitalLink', () => {
     it('should throw for an invalid attribute type', () => {
       expect(() => dl.setAttribute({ thngId: 'U5mQKGDpnymBwQwRakyBqeYh' })).to.throw();
     });
+
+    it('should set a linktype', () => {
+      dl = DigitalLink('https://gs1.evrythng.com/01/12345678');
+      expect(() => dl.setLinkType('test')).to.not.throw();
+      expect(dl.toWebUriString()).to.equal('https://gs1.evrythng.com/01/12345678?linkType=test');
+    });
   });
 
   describe('Generation', () => {

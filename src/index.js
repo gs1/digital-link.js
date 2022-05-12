@@ -204,6 +204,8 @@ const encode = dl => {
       dl.attributes.linkType = dl.linkType;
     }
     result = addQueryParams(`${result}?`, dl.attributes);
+  } else if (dl.linkType) {
+    result += `?linkType=${dl.linkType}`;
   }
 
   return result;
