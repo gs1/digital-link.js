@@ -57,22 +57,24 @@ the same result.
 
 The object can contain the following items:
 
-- `domain` (string) - The domain to use.
+- `domain` (string) - The domain name of the Digital Link.
 - `identifier` (object) - An object containing a single GS1 Application
   Identifier, such as GTIN, as a key-value pair.
 - `keyQualifiers` (object) - An object containing one or more GS1 Key Qualifiers
   as key-value pairs.
 - `attributes` (object) - As for `keyQualifiers`, but containing GS1 Data
-  Attributes and custom data attributes.
+  Attributes and custom extensions supported in the standard as query parameters.
 - `sortKeyQualifiers` (boolean) - false by default. If you set it to true, the 
-key qualifiers will be sorted in the Web Uri String to match the order defined 
+key qualifiers will be sorted in the Web URI String to match the order defined 
 by the GS1 Digital Link Grammar.
 - `keyQualifiersOrder` (Array) - It's an array that contains all the keys of the 
 key qualifiers. If the length of the array is not equal to the length of the
 `keyQualifiers` field, this array will be ignored. In this case, the order of the
-key qualifier in the Web Uri String will be the order of the map.
+key qualifier in the Web URI String will be the order of the map.
 Otherwise (if the length of the two fields are equal), the order of the key 
-qualifier in the Web Uri String will be the order define in this field.
+qualifier in the Web URI String will be the order define in this field.
+- `linkType` - (string) - This optional parameter allows you to request standard 
+types of information for a particular Digital Link.
 
 An example is shown below:
 
@@ -91,6 +93,7 @@ const dl = DigitalLink({
   keyQualifiersOrder: [
     '10','21'
   ],
+  linkType : webVoc.linkType.allergenInfo,
   attributes: {
     thngId: 'UMwxDXBdUbxgtyRaR2HBrc4r',
   },
@@ -116,6 +119,7 @@ dl.setIdentifier('01', '00860080001300');
 dl.setKeyQualifier('21', '43786');
 dl.setKeyQualifier('10', '12345');
 dl.setKeyQualifiersOrder(['10', '21']);
+dl.setLinkType('gs1:allergenInfo');
 dl.setAttribute('thngId', 'UMwxDXBdUbxgtyRaR2HBrc4r');
 ```
 
@@ -130,16 +134,17 @@ const dl = DigitalLink()
   .setKeyQualifier('21', '43786')
   .setKeyQualifier('10', '12345')
   .setKeyQualifiersOrder(['10', '21'])
+  .setLinkType('gs1:allergenInfo')
   .setAttribute('thngId', 'UMwxDXBdUbxgtyRaR2HBrc4r');
 ```
 
 
-### Create from Web URI
+### Create from Web URI aka URL
 
 A `DigitalLink` object can also be created using an existing string:
 
 ```js
-const uri = 'https://dlnkd.tn.gg/01/00860080001300/10/12345/21/43786';
+const uri = 'https://dlnkd.tn.gg/01/00860080001300/10/12345/21/43786?linkType=gs1:allergenInfo';
 
 const dl = DigitalLink(uri);
 ```
@@ -147,7 +152,7 @@ const dl = DigitalLink(uri);
 
 ### Web URI and JSON Generation
 
-A `DigitalLink` object can transform itself into a string Web URI representation:
+A `DigitalLink` object can transform itself into a string Web URI (aka URL) representation:
 
 ```js
 const uri = dl.toWebUriString();
@@ -167,10 +172,11 @@ console.log(jsonString);
 const dl2 = DigitalLink(JSON.parse(jsonString));
 ```
 
-### Web vocabulary
+### Link Types - `linkType`
 
-The SDK supports the Digital Link `linkTypes` standardized in the [GS1 Web Vocabulary](https://www.gs1.org/voc/). To use `linkTypes` simply import
-`webVoc` as shown below.
+The SDK supports the GS1 Digital Link `linkType` feature. Link types allow applications to request specific information for a given product. For instance an application could request allergen information for a given GTIN by adding the link type `linkType=gs1:allergenInfo`. Supported standard link types are specified in the [GS1 Web Vocabulary](https://www.gs1.org/voc/) and additionally you can define your own types.
+
+`setLinkType` and `getLinkType` allow specifying respectively reading a link type. On top of this the SDK provides a convenient list of all supported standard link types. To use it simply import `webVoc` as shown below:
 
 ```js
 const { DigitalLink, webVoc } = require('digital-link.js');
@@ -229,9 +235,8 @@ The example above contains an erroneous 'x' at the end, so it does not validate:
 
 ### Compression
 
-The
-[GS1 Digital Link 1.1 draft specification](https://www.gs1.org/standards/gs1-digital-link)
-describes a compression/decompression mechanism that allows for shorter URLs and
+The GS1 Digital Link standard also describes an (offline) 
+compression/decompression mechanism that allows for shorter URLs and 
 hence unlocks use cases where the size of the data carrier (e.g., QR code) is
 very limited.
 
