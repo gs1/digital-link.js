@@ -3,15 +3,18 @@ FROM node:12-alpine
 ARG NPM_TOKEN
 
 WORKDIR /srv
-COPY . /srv
 
-# Install dependencues
-RUN echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-RUN apk add --no-cache python3
+# Linux dependencies layer
+RUN apk add --no-cache python3 py3-pip
 RUN pip3 install awscli --upgrade --user
+
+# npm dependencies layer
+RUN echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+COPY package* /srv/
 RUN npm ci
 
-# Build
+# Build library layer
+COPY . /srv
 RUN npm run build
 
 # Deploy
