@@ -1,7 +1,7 @@
 'use strict';
 
 const { expect } = require('chai');
-const { DigitalLink, Utils } = require('..');
+const { DigitalLink, Utils, CheckDigit, webVoc } = require('..');
 
 const DATA = {
   domain: 'https://gs1.evrythng.com',
@@ -26,12 +26,13 @@ const DATA = {
     key: 'thngId',
     value: 'U5mQKGDpnymBwQwRakyBqeYh',
   },
+  linkType: 'test',
   url:
-    'https://gs1.evrythng.com/01/9780345418913/10/38737643/21/58943?15=230911&thngId=U5mQKGDpnymBwQwRakyBqeYh',
+    'https://gs1.evrythng.com/01/9780345418913/10/38737643/21/58943?15=230911&thngId=U5mQKGDpnymBwQwRakyBqeYh&linkType=test',
   jsonString:
-    '{"domain":"https://gs1.evrythng.com","identifier":{"01":"9780345418913"},"keyQualifiers":{"10":"38737643","21":"58943"},"attributes":{"15":"230911","thngId":"U5mQKGDpnymBwQwRakyBqeYh"},"sortKeyQualifiers":false,"keyQualifiersOrder":["10","21"]}',
+    '{"domain":"https://gs1.evrythng.com","identifier":{"01":"9780345418913"},"keyQualifiers":{"10":"38737643","21":"58943"},"attributes":{"15":"230911","thngId":"U5mQKGDpnymBwQwRakyBqeYh"},"sortKeyQualifiers":false,"keyQualifiersOrder":["10","21"],"linkType":"test"}',
   compressedWebUri:
-    'https://gs1.evrythng.com/HxHKVAdpQhCTxbrOF_yEFcx_4a2GeAh1mFOZkChg6Z8pgcEMEWpMganmIQ',
+    'https://gs1.evrythng.com/HxHKVAdpQhCTxbrOF_yEFcx_4a2GeAh1mFOZkChg6Z8pgcEMEWpMganmIfESxTyJ5UvMJa9Za',
 };
 
 /**
@@ -48,6 +49,7 @@ const createUsingSetters = () => {
   dl.setKeyQualifiersOrder(DATA.keyQualifiersOrder);
   dl.setAttribute(DATA.bestBeforeAttribute.key, DATA.bestBeforeAttribute.value);
   dl.setAttribute(DATA.customAttribute.key, DATA.customAttribute.value);
+  dl.setLinkType(DATA.linkType);
   return dl;
 };
 
@@ -69,6 +71,7 @@ const createUsingObject = () =>
       [DATA.bestBeforeAttribute.key]: DATA.bestBeforeAttribute.value,
       [DATA.customAttribute.key]: DATA.customAttribute.value,
     },
+    linkType: DATA.linkType,
   });
 
 /**
@@ -91,7 +94,8 @@ const createUsingChain = () =>
     .setKeyQualifier(DATA.serialQualifier.key, DATA.serialQualifier.value)
     .setKeyQualifiersOrder(DATA.keyQualifiersOrder)
     .setAttribute(DATA.bestBeforeAttribute.key, DATA.bestBeforeAttribute.value)
-    .setAttribute(DATA.customAttribute.key, DATA.customAttribute.value);
+    .setAttribute(DATA.customAttribute.key, DATA.customAttribute.value)
+    .setLinkType(DATA.linkType);
 
 describe('Exports', () => {
   it('should export DigitalLink', () => {
@@ -131,6 +135,11 @@ describe('Exports', () => {
   it('should export Utils.isCompressedWebUri', () => {
     expect(Utils.isCompressedWebUri).to.be.a('function');
   });
+
+  it('should export the web vocabulary', () => {
+    expect(webVoc).to.be.a('object');
+    expect(webVoc.linkType.activityIdeas).to.equal('gs1:activityIdeas');
+  });
 });
 
 describe('DigitalLink', () => {
@@ -168,6 +177,15 @@ describe('DigitalLink', () => {
       expect(dl.getKeyQualifier('10')).to.equal('38737643');
     });
 
+    it('should create from string - domain + identifier + 1 key qualifier + 1 linkType', () => {
+      const dl = DigitalLink('https://gs1.evrythng.com/01/9780345418913/10/38737643?linkType=barcode');
+
+      expect(dl.getDomain()).to.equal(DATA.domain);
+      expect(dl.getIdentifier()).to.deep.equal({ '01': '9780345418913' });
+      expect(dl.getKeyQualifier('10')).to.equal('38737643');
+      expect(dl.getLinkType()).to.equal('barcode');
+    });
+
     it('should create from string - domain + identifier + 2 key qualifiers', () => {
       const dl = DigitalLink('https://gs1.evrythng.com/01/9780345418913/10/38737643/21/58943');
 
@@ -199,10 +217,24 @@ describe('DigitalLink', () => {
       expect(dl.getAttribute('thngId')).to.equal('U5mQKGDpnymBwQwRakyBqeYh');
     });
 
+    it('should create from string - domain + identifier + 2 key qualifiers + 2 attributes + linkType', () => {
+      const dl = DigitalLink(
+        'https://gs1.evrythng.com/01/9780345418913/10/38737643/21/58943?15=230911&thngId=U5mQKGDpnymBwQwRakyBqeYh&linkType=product',
+      );
+
+      expect(dl.getDomain()).to.equal(DATA.domain);
+      expect(dl.getIdentifier()).to.deep.equal({ '01': '9780345418913' });
+      expect(dl.getKeyQualifier('10')).to.equal('38737643');
+      expect(dl.getKeyQualifier('21')).to.equal('58943');
+      expect(dl.getAttribute('15')).to.equal('230911');
+      expect(dl.getAttribute('thngId')).to.equal('U5mQKGDpnymBwQwRakyBqeYh');
+      expect(dl.getLinkType()).to.equal('product');
+    });
+
     it('should create from string - compressed URI', () => {
       const dl = DigitalLink(DATA.compressedWebUri);
       const expected =
-        'https://gs1.evrythng.com/01/09780345418913/10/38737643/21/58943?15=230911&thngId=U5mQKGDpnymBwQwRakyBqeYh';
+        'https://gs1.evrythng.com/01/09780345418913/10/38737643/21/58943?15=230911&thngId=U5mQKGDpnymBwQwRakyBqeYh&linkType=test';
 
       expect(dl.toWebUriString()).to.equal(expected);
     });
@@ -213,6 +245,7 @@ describe('DigitalLink', () => {
       expect(createUsingString().toWebUriString()).to.equal(expected);
       expect(createUsingSetters().toWebUriString()).to.equal(expected);
       expect(createUsingChain().toWebUriString()).to.equal(expected);
+      expect(DATA.url).to.equal(expected);
     });
 
     it('should not allow access to underlying data', () => {
@@ -291,8 +324,27 @@ describe('DigitalLink', () => {
       expect(value).to.equal(DATA.customAttribute.value);
     });
 
-    it('should return all attributes', () => {
+    it('should return all attributes with linkType', () => {
       const value = createUsingSetters().getAttributes();
+      const expected = {
+        [DATA.bestBeforeAttribute.key]: DATA.bestBeforeAttribute.value,
+        [DATA.customAttribute.key]: DATA.customAttribute.value,
+        'linkType': 'test',
+      };
+
+      expect(value).to.deep.equal(expected);
+    });
+
+    it('should return all attributes without linkType', () => {
+      const value = DigitalLink()
+        .setDomain(DATA.domain)
+        .setIdentifier(DATA.identifier.key, DATA.identifier.value)
+        .setKeyQualifier(DATA.batchQualifier.key, DATA.batchQualifier.value)
+        .setKeyQualifier(DATA.serialQualifier.key, DATA.serialQualifier.value)
+        .setKeyQualifiersOrder(DATA.keyQualifiersOrder)
+        .setAttribute(DATA.bestBeforeAttribute.key, DATA.bestBeforeAttribute.value)
+        .setAttribute(DATA.customAttribute.key, DATA.customAttribute.value)
+        .getAttributes();
       const expected = {
         [DATA.bestBeforeAttribute.key]: DATA.bestBeforeAttribute.value,
         [DATA.customAttribute.key]: DATA.customAttribute.value,
@@ -300,6 +352,20 @@ describe('DigitalLink', () => {
 
       expect(value).to.deep.equal(expected);
     });
+
+
+
+    it('should return link type', () => {
+      const value = createUsingSetters().getLinkType();
+      const value2 = createUsingSetters().getAttribute('linkType');
+      const value3 = createUsingSetters().getAttributes().linkType;
+      const expected = DATA.linkType;
+
+      expect(value).to.deep.equal(expected);
+      expect(value2).to.deep.equal(expected);
+      expect(value3).to.deep.equal(expected);
+    });
+
   });
 
   describe('Setters', () => {
@@ -365,7 +431,7 @@ describe('DigitalLink', () => {
       const values = {
         gtin: {
           ai: '01',
-          value: '12345678',
+          value: '12345670',
         },
         lot: {
           ai: '10',
@@ -413,6 +479,12 @@ describe('DigitalLink', () => {
 
     it('should throw for an invalid attribute type', () => {
       expect(() => dl.setAttribute({ thngId: 'U5mQKGDpnymBwQwRakyBqeYh' })).to.throw();
+    });
+
+    it('should set a linktype', () => {
+      dl = DigitalLink('https://gs1.evrythng.com/01/12345678');
+      expect(() => dl.setLinkType('test')).to.not.throw();
+      expect(dl.toWebUriString()).to.equal('https://gs1.evrythng.com/01/12345678?linkType=test');
     });
   });
 
@@ -514,12 +586,12 @@ describe('DigitalLink', () => {
 
     describe('Some example test cases', () => {
       it('should allow a GTIN only', () => {
-        const dl = DigitalLink('https://example.com/01/01234567/');
+        const dl = DigitalLink('https://example.com/01/01234565/');
         expect(dl.isValid()).to.equal(true);
       });
 
       it('should allow a GTIN with two key qualifiers', () => {
-        const dl = DigitalLink('https://example.com/01/01234567/10/12345/21/4512');
+        const dl = DigitalLink('https://example.com/01/01234565/10/12345/21/4512');
         expect(dl.isValid()).to.equal(true);
       });
 
@@ -529,13 +601,13 @@ describe('DigitalLink', () => {
       });
 
       it('Should validate when key qualifiers are not in the right order, but were sorted (Numeric)', () => {
-        const dl = DigitalLink('https://example.com/01/01234567/21/12345/10/4512');
+        const dl = DigitalLink('https://example.com/01/01234565/21/12345/10/4512');
         dl.setSortKeyQualifiers(true);
         expect(dl.isValid()).to.equal(true);
       });
 
       it('Should validate when key qualifiers are not in the right order, but were sorted (Alphanumeric)', () => {
-        const dl = DigitalLink('https://example.com/01/01234567/21/12345/10/4512');
+        const dl = DigitalLink('https://example.com/01/01234565/21/12345/10/4512');
         dl.setSortKeyQualifiers(true);
         expect(dl.isValid()).to.equal(true);
       });
@@ -555,6 +627,92 @@ describe('DigitalLink', () => {
         const dl = DigitalLink('https://example.com/01/12345678/10/4512?4321=2');
         expect(dl.isValid()).to.equal(false);
       });
+
+      it('should validate since additionalIdParameter is a xchar', () => {
+        const dl = DigitalLink('https://example.com/01/12345670/10/4512?240=ABCD');
+        expect(dl.isValid()).to.equal(true);
+      });
+
+      it('should validate only valid check digits for gtin', () => {
+        let dl = DigitalLink('https://example.com/gtin/012345678905');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/01/012345678905');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/01/012345678906');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for grai', () => {
+        let dl = DigitalLink('https://example.com/grai/050606547800290002');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/8003/050606547800230002');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gln', () => {
+        let dl = DigitalLink('https://example.com/gln/0123456789128');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gln/0123456789123');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for sscc', () => {
+        let dl = DigitalLink('https://example.com/sscc/012345678912345675');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/sscc/012345678912345673');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gsrn', () => {
+        let dl = DigitalLink('https://example.com/gsrn/012345678912345675');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gsrn/012345678912345673');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gdti', () => {
+        let dl = DigitalLink('https://example.com/gdti/012345178912345667');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gdti/012341178912345667');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gsin', () => {
+        let dl = DigitalLink('https://example.com/gsin/01234367891244565');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gsin/01234567891244565');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it('should validate only valid check digits for gcn', () => {
+        let dl = DigitalLink('https://example.com/gcn/01234567891284569');
+        expect(dl.isValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/gcn/01234567891244569');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+
+      it("should not validate since the identifier hasn't any check digit", () => {
+        let dl = DigitalLink('https://example.com/giai/0801234126');
+        expect(dl.isValid()).to.equal(false);
+        dl = DigitalLink('https://example.com/giai/0801234127');
+        expect(dl.isValid()).to.equal(false);
+      });
+
+      it("should use the isCheckDigitValid method correctly", () => {
+        let dl = DigitalLink('https://example.com/gtin/012345678905');
+        expect(dl.isCheckDigitValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/01/012345678905');
+        expect(dl.isCheckDigitValid()).to.equal(true);
+        dl = DigitalLink('https://example.com/01/012345678906');
+        expect(dl.isCheckDigitValid()).to.equal(false);
+      });
+
+      it('should validate since linkTypes are authorized', () => {
+        const dl = DigitalLink('https://example.com/01/12345670/10/4512?linkType=ABCD');
+        expect(dl.isValid()).to.equal(true);
+      });
+
     });
   });
 });
@@ -677,6 +835,31 @@ describe('Utils', () => {
     const segments = ['some', '01', 'path', '01', '12345678', '21', '4545646'];
     expect(Utils.getIdentifierCodeIndex(segments)).to.equal(3);
   });
+
+});
+
+describe('Check digits', () => {
+
+  it('Should check if the key is a key code or not', () => {
+    expect(CheckDigit.isKeyCode('01')).to.equal(true);
+    expect(CheckDigit.isKeyCode('gtin')).to.equal(false);
+    expect(CheckDigit.isKeyCode('01a')).to.equal(false);
+    expect(CheckDigit.isKeyCode('0123456789')).to.equal(true);
+  });
+
+  it('Should check the check digit of GRAI field', () => {
+    expect(CheckDigit.validateCheckDigit(14,"050606547800290002")).to.equal(true);
+    expect(CheckDigit.validateCheckDigit(14,"050606547800230002")).to.equal(false);
+  });
+
+  it('Should check the check digit of GTIN field', () => {
+    // -1 means end of string
+    expect(CheckDigit.validateCheckDigit(-1,"012345678905")).to.equal(true);
+    expect(CheckDigit.validateCheckDigit(-1,"012345678906")).to.equal(false);
+    expect(CheckDigit.validateCheckDigit(-1,"00012345678905")).to.equal(true);
+    expect(CheckDigit.validateCheckDigit(-1,"00012345678908")).to.equal(false);
+  });
+
 });
 
 describe('Grammar', () => {

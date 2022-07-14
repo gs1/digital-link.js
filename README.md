@@ -36,7 +36,7 @@ const { DigitalLink, Utils } = require('digital-link.js');
 Add a `<script>` tag to your HTML page:
 
 ```html
-<script src="https://d10ka0m22z5ju5.cloudfront.net/js/digital-link.js/1.2.2/digital-link.js-1.2.2.js"></script>
+<script src="https://d10ka0m22z5ju5.cloudfront.net/js/digital-link.js/1.3.0/digital-link.js-1.3.0.js"></script>
 ```
 
 Then access the `digitalLinkJs` global variable:
@@ -167,6 +167,15 @@ console.log(jsonString);
 const dl2 = DigitalLink(JSON.parse(jsonString));
 ```
 
+### Web vocabulary
+
+The SDK supports the Digital Link `linkTypes` standardized in the [GS1 Web Vocabulary](https://www.gs1.org/voc/). To use `linkTypes` simply import
+`webVoc` as shown below.
+
+```js
+const { DigitalLink, webVoc } = require('digital-link.js');
+dl.setLinkType(webVoc.linkType.allergenInfo);
+```
 
 ### Digital Link Validation
 
@@ -213,6 +222,10 @@ The example above contains an erroneous 'x' at the end, so it does not validate:
 > Warning : if your domain contains a custom path (for example : `https://example.com/custom/path/01/00860080001300`), 
 > It will be removed (`https://example.com/01/00860080001300`) in the validation trace. That's because the
 > Digital Link Grammar file doesn't support the custom paths.
+
+> Warning : The isValid method also checks if the identifier has a valid check digit. If it isn't the case, it will 
+> return false. However, the getValidationTrace won't show any error since it doesn't take into account the check digit
+> verification.
 
 ### Compression
 
