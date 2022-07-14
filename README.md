@@ -170,11 +170,11 @@ const dl2 = DigitalLink(JSON.parse(jsonString));
 ### Web vocabulary
 
 The SDK enables you to easily search among all attributes of some web vocabulary. In order to do this, you 
-need to import `webDoc` as shown below. For now, only `linkType` is supported.
+`webVoc` as shown below.
 
 ```js
 const { DigitalLink, webVoc } = require('digital-link.js');
-dl.setLinkType(webVoc.linkType.activityIdeas);
+dl.setLinkType(webVoc.linkType.allergenInfo);
 ```
 
 ### Digital Link Validation
