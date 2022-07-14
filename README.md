@@ -36,7 +36,7 @@ const { DigitalLink, Utils } = require('digital-link.js');
 Add a `<script>` tag to your HTML page:
 
 ```html
-<script src="https://d10ka0m22z5ju5.cloudfront.net/js/digital-link.js/1.2.4/digital-link.js-1.2.4.js"></script>
+<script src="https://d10ka0m22z5ju5.cloudfront.net/js/digital-link.js/1.3.0/digital-link.js-1.3.0.js"></script>
 ```
 
 Then access the `digitalLinkJs` global variable:
@@ -167,6 +167,15 @@ console.log(jsonString);
 const dl2 = DigitalLink(JSON.parse(jsonString));
 ```
 
+### Web vocabulary
+
+The SDK supports the Digital Link `linkTypes` standardized in the [GS1 Web Vocabulary](https://www.gs1.org/voc/). To use `linkTypes` simply import
+`webVoc` as shown below.
+
+```js
+const { DigitalLink, webVoc } = require('digital-link.js');
+dl.setLinkType(webVoc.linkType.allergenInfo);
+```
 
 ### Digital Link Validation
 

@@ -17,6 +17,7 @@ const {
 } = require('./util');
 const { validateCheckDigit, validateIdentifierCheckDigit, isKeyCode } = require('./checkDigit');
 const { compressWebUri, decompressWebUri, isCompressedWebUri } = require('./compression');
+const { webVoc } = require('./data/webVoc');
 
 /**
  * Individual parser rules that can be run with `testRule()`.
@@ -119,6 +120,12 @@ const decode = (dl, str) => {
         const [key, value] = pair.split('=');
         dl.attributes[key] = value;
       });
+
+    // if the linkType is specified, I remove it from the attributes
+    if (dl.attributes.linkType) {
+      dl.linkType = dl.attributes.linkType;
+      delete dl.attributes.linkType;
+    }
   }
 };
 
@@ -193,7 +200,12 @@ const encode = dl => {
 
   // Data Attributes
   if (Object.keys(dl.attributes).length) {
+    if (dl.linkType) {
+      dl.attributes.linkType = dl.linkType;
+    }
     result = addQueryParams(`${result}?`, dl.attributes);
+  } else if (dl.linkType) {
+    result += `?linkType=${dl.linkType}`;
   }
 
   return result;
@@ -229,6 +241,7 @@ const DigitalLink = input => {
       attributes: {},
       sortKeyQualifiers: false,
       keyQualifiersOrder: [],
+      linkType: null,
     },
   };
 
@@ -246,6 +259,11 @@ const DigitalLink = input => {
       Object.keys(input.keyQualifiers).forEach(key => {
         result[model].keyQualifiersOrder.push(key);
       });
+    }
+
+    if (input.linkType) {
+      assertPropertyType(input, 'linkType', 'string');
+      result[model].linkType = input.linkType;
     }
 
     if (input.attributes) {
@@ -348,14 +366,44 @@ const DigitalLink = input => {
     return result;
   };
 
+  /**
+   * Setter for the field linkType
+   *
+   * @param {string} value - The linkType value
+   * @returns {object} the dl instance
+   */
+  result.setLinkType = value => {
+    if (typeof value !== 'string') {
+      throw new Error('linkType must be a string');
+    }
+    result[model].linkType = value;
+    return result;
+  };
+
   result.getDomain = () => result[model].domain;
   result.getIdentifier = () => result[model].identifier;
   result.getKeyQualifier = key => result[model].keyQualifiers[key];
   result.getKeyQualifiers = () => result[model].keyQualifiers;
-  result.getAttribute = key => result[model].attributes[key];
-  result.getAttributes = () => result[model].attributes;
+  result.getAttribute = key => {
+    if (key === 'linkType') {
+      return result[model].linkType;
+    }
+    return result[model].attributes[key];
+  };
+  result.getAttributes = () => {
+    const obj = {
+      ...result[model].attributes,
+    };
+
+    if (result[model].linkType) {
+      obj.linkType = result[model].linkType;
+    }
+
+    return obj;
+  };
   result.getSortKeyQualifiers = () => result[model].sortKeyQualifiers;
   result.getKeyQualifiersOrder = () => result[model].keyQualifiersOrder;
+  result.getLinkType = () => result[model].linkType;
 
   result.toWebUriString = () => encode(result[model]);
   result.toCompressedWebUriString = () => compressWebUri(result.toWebUriString());
@@ -399,6 +447,7 @@ const testRule = (rule, value) => {
 
 module.exports = {
   DigitalLink,
+  webVoc,
   Utils: {
     Rules,
     testRule,
