@@ -169,7 +169,7 @@ const dl2 = DigitalLink(JSON.parse(jsonString));
 
 ### Web vocabulary
 
-The SDK enables you to easily search among all attributes of some web vocabulary. In order to do this, you 
+The SDK supports the Digital Link `linkTypes` standardized in the [GS1 Web Vocabulary](https://www.gs1.org/voc/). To use `linkTypes` simply import
 `webVoc` as shown below.
 
 ```js
