@@ -1,6 +1,6 @@
 # digital-link.js
 
-Javascript library for creating, verifying, and representing/transferring
+Javascript library by [Digimarc](https://www.digimarc.com/) for creating, verifying, and representing/transferring
 [GS1 Digital Links](https://evrythng.com/news/upgrading-the-barcode-to-the-web-gs1-digital-link/).
 
 This is the library powering the
